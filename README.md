@@ -31,6 +31,10 @@ VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
 ```
 
+For GitHub Pages production builds, the app can also read these public browser
+values from `.env.production`. Only the publishable browser key belongs there;
+never put `service_role` or other server secrets in a Vite env file.
+
 Apply the schema in `supabase/migrations`, then deploy the Edge Functions in
 `supabase/functions`.
 
