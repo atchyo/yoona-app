@@ -315,14 +315,13 @@ export function App(): ReactElement {
 
   if (!authResolved) {
     return (
-      <main className="login-page">
-        <section className="login-card" aria-live="polite">
-          <div className="login-card-head">
-            <p className="eyebrow">Opti-Me</p>
-          </div>
-          <h2>로그인 확인 중</h2>
-          <p className="muted">세션을 확인하고 있어요. 잠시만 기다려주세요.</p>
-        </section>
+      <main className="auth-boot" aria-live="polite" aria-busy="true">
+        <div className="auth-boot-indicator" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        <p className="sr-only">로그인 세션을 확인하고 있습니다.</p>
       </main>
     );
   }
