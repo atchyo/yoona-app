@@ -16,6 +16,7 @@ import { ProfilesPage } from "./pages/ProfilesPage";
 import { RemindersPage } from "./pages/RemindersPage";
 import { RuleChatPage } from "./pages/RuleChatPage";
 import { ServiceAdminPage } from "./pages/ServiceAdminPage";
+import { appConfig } from "./config";
 import { signOutSupabase, supabase } from "./services/supabaseClient";
 import {
   clearUser,
@@ -47,7 +48,7 @@ import type {
   ThemeMode,
 } from "./types";
 
-const basePath = "/yoona-app";
+const basePath = appConfig.basePath;
 
 export function App(): ReactElement {
   const [theme, setTheme] = useState<ThemeMode>(() => loadTheme());
@@ -385,7 +386,10 @@ function getInitialRoute(): Route {
 }
 
 function getRouteFromLocation(): Route {
-  const path = window.location.pathname.replace(basePath, "") || "/";
+  const path =
+    basePath && window.location.pathname.startsWith(basePath)
+      ? window.location.pathname.slice(basePath.length) || "/"
+      : window.location.pathname || "/";
   return normalizeRoute(path);
 }
 
@@ -409,11 +413,11 @@ function normalizeRoute(path: string): Route {
 }
 
 function pushRoute(route: Route): void {
-  window.history.pushState({}, "", `${basePath}${route === "/" ? "/" : route}`);
+  window.history.pushState({}, "", `${basePath || ""}${route === "/" ? "/" : route}`);
 }
 
 function replaceRoute(route: Route): void {
-  window.history.replaceState({}, "", `${basePath}${route === "/" ? "/" : route}`);
+  window.history.replaceState({}, "", `${basePath || ""}${route === "/" ? "/" : route}`);
 }
 
 function displayProfileForUser(

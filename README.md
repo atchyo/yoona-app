@@ -1,4 +1,4 @@
-# yoona-app
+# yoona-optime
 
 Opti-Me family medication care web app for GitHub Pages.
 
@@ -19,7 +19,7 @@ npm run dev
 npm run build
 ```
 
-The app is configured for GitHub Pages at `/yoona-app/`.
+The app is configured for a root-domain deployment such as `https://optime.jeongung.cloud/`.
 
 ## Supabase
 

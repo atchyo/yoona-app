@@ -15,7 +15,7 @@ export async function signInWithProvider(provider: "google" | "kakao"): Promise<
     throw new Error("Supabase is not configured. Use demo login or add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
   }
 
-  const redirectTo = `${window.location.origin}/yoona-app/`;
+  const redirectTo = `${window.location.origin}${appConfig.basePath || ""}/`;
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
     options: { redirectTo },
