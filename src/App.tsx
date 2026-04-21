@@ -53,6 +53,7 @@ const basePath = appConfig.basePath;
 export function App(): ReactElement {
   const [theme, setTheme] = useState<ThemeMode>(() => loadTheme());
   const [user, setUser] = useState<DemoUser | null>(() => loadUser());
+  const [authResolved, setAuthResolved] = useState<boolean>(() => !supabase);
   const [route, setRoute] = useState<Route>(() => getInitialRoute());
   const [careProfileList, setCareProfileList] = useState<CareProfile[]>(() =>
     migrateDemoCareProfiles(loadCareProfiles(seedCareProfiles)),
@@ -133,39 +134,59 @@ export function App(): ReactElement {
   }, []);
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      setAuthResolved(true);
+      return;
+    }
+
+    function applyAuthenticatedUser(nextUser: DemoUser): void {
+      saveUser(nextUser);
+      setUser((current) => {
+        if (current?.id !== nextUser.id) {
+          selectDefaultProfileForUser(nextUser);
+        }
+        return nextUser;
+      });
+
+      if (getRouteFromLocation() === "/login") {
+        replaceRoute("/");
+        setRoute("/");
+      }
+    }
 
     async function syncSupabaseSession(): Promise<void> {
       if (!supabase) return;
+
       const { data } = await supabase.auth.getSession();
-      if (!data.session?.user) return;
-      const nextUser = mapSupabaseUser(data.session.user);
-      saveUser(nextUser);
-      setUser(nextUser);
-      if (user?.id !== nextUser.id) selectDefaultProfileForUser(nextUser);
+      if (data.session?.user) {
+        applyAuthenticatedUser(mapSupabaseUser(data.session.user));
+      }
+      setAuthResolved(true);
     }
 
     void syncSupabaseSession();
 
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session?.user) return;
-      const nextUser = mapSupabaseUser(session.user);
-      saveUser(nextUser);
-      setUser(nextUser);
-      if (user?.id !== nextUser.id) selectDefaultProfileForUser(nextUser);
-      if (route === "/login") {
-        pushRoute("/");
-        setRoute("/");
+      if (session?.user) {
+        applyAuthenticatedUser(mapSupabaseUser(session.user));
       }
+      setAuthResolved(true);
     });
 
     return () => data.subscription.unsubscribe();
-  }, [route]);
+  }, [careProfileList]);
 
   useEffect(() => {
+    if (!authResolved) return;
+
     if (!user && route !== "/login") {
       setRoute("/login");
       replaceRoute("/login");
+    }
+
+    if (user && route === "/login") {
+      setRoute("/");
+      replaceRoute("/");
     }
 
     if (user?.role !== "admin" && route === "/service-admin") {
@@ -177,7 +198,7 @@ export function App(): ReactElement {
       setRoute("/");
       replaceRoute("/");
     }
-  }, [route, user]);
+  }, [authResolved, route, user]);
 
   function navigate(nextRoute: Route): void {
     if (!user && nextRoute !== "/login") {
@@ -292,7 +313,21 @@ export function App(): ReactElement {
     }
   }
 
-  if (!user || route === "/login") {
+  if (!authResolved) {
+    return (
+      <main className="login-page">
+        <section className="login-card" aria-live="polite">
+          <div className="login-card-head">
+            <p className="eyebrow">Opti-Me</p>
+          </div>
+          <h2>로그인 확인 중</h2>
+          <p className="muted">세션을 확인하고 있어요. 잠시만 기다려주세요.</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (!user) {
     return (
       <LoginPage
         onDemoLogin={handleDemoLogin}
