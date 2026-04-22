@@ -41,6 +41,7 @@ export interface FamilyMember {
   role: FamilyRole;
   displayName: string;
   email: string;
+  accessibleProfileIds: string[];
 }
 
 export interface CareProfile {

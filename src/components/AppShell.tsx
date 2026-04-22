@@ -1,6 +1,7 @@
+import { useState } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { ThemeToggle } from "./ThemeToggle";
-import type { CareProfile, DemoUser, ThemeMode } from "../types";
+import type { CareProfile, DemoUser, FamilyMember, ThemeMode } from "../types";
 
 export type Route =
   | "/"
@@ -25,26 +26,33 @@ const navItems: Array<{ path: Route; label: string; ownerOnly?: boolean; adminOn
 const appIconSrc = `${import.meta.env.BASE_URL}opti_me_top_left_icon.png`;
 
 interface AppShellProps {
+  availableProfiles: CareProfile[];
   children: ReactNode;
   currentProfile: CareProfile;
   onLogout: () => void;
   onNavigate: (route: Route) => void;
+  onProfileChange: (profileId: string) => void;
   onThemeToggle: () => void;
   route: Route;
   theme: ThemeMode;
+  familyMembers: FamilyMember[];
   user: DemoUser;
 }
 
 export function AppShell({
+  availableProfiles,
   children,
   currentProfile,
+  familyMembers,
   onLogout,
   onNavigate,
+  onProfileChange,
   onThemeToggle,
   route,
   theme,
   user,
 }: AppShellProps): ReactElement {
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const visibleItems = navItems.filter((item) => {
     if (item.adminOnly) return user.role === "admin";
     if (item.ownerOnly) return user.familyRole === "owner" || user.familyRole === "manager";
@@ -76,9 +84,9 @@ export function AppShell({
           ))}
         </nav>
         <div className="sidebar-card">
-          <span className="sidebar-card-label">보고 있는 프로필</span>
+          <span className="sidebar-card-label">현재 관리 대상</span>
           <strong>{currentProfile.name}</strong>
-          <p>{user.familyRole === "owner" ? "가족약에서 선택한 관리 대상" : "내 복용 기록 기준"}</p>
+          <p>우측 상단 이름을 눌러 다른 가족으로 전환할 수 있습니다.</p>
         </div>
       </aside>
 
@@ -90,9 +98,40 @@ export function AppShell({
           </div>
           <div className="topbar-actions">
             <ThemeToggle onToggle={onThemeToggle} theme={theme} />
-            <div className="user-chip" aria-label="로그인 사용자">
-              <span>{userRoleLabel(user)}</span>
-              <strong>{user.name}</strong>
+            <div className="profile-switcher">
+              <button
+                aria-expanded={isProfileMenuOpen}
+                aria-haspopup="listbox"
+                className="user-chip profile-switcher-button"
+                onClick={() => setIsProfileMenuOpen((current) => !current)}
+                type="button"
+              >
+                <span>{profileRoleLabel(currentProfile, familyMembers, user)}</span>
+                <div className="profile-switcher-copy">
+                  <strong>{currentProfile.name}</strong>
+                  <small>{user.name} 계정으로 로그인됨</small>
+                </div>
+              </button>
+              {isProfileMenuOpen && (
+                <div aria-label="관리 대상 선택" className="profile-switcher-menu" role="listbox">
+                  {availableProfiles.map((profile) => (
+                    <button
+                      aria-selected={profile.id === currentProfile.id}
+                      className={profile.id === currentProfile.id ? "profile-option active" : "profile-option"}
+                      key={profile.id}
+                      onClick={() => {
+                        onProfileChange(profile.id);
+                        setIsProfileMenuOpen(false);
+                      }}
+                      role="option"
+                      type="button"
+                    >
+                      <strong>{profile.name}</strong>
+                      <span>{profileRoleLabel(profile, familyMembers, user)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <button className="ghost-button" onClick={onLogout} type="button">
               로그아웃
@@ -120,9 +159,15 @@ export function AppShell({
   );
 }
 
-function userRoleLabel(user: DemoUser): string {
+function profileRoleLabel(
+  profile: CareProfile,
+  familyMembers: FamilyMember[],
+  user: DemoUser,
+): string {
+  if (profile.type === "pet") return "반려";
+  const member = familyMembers.find((item) => item.userId === profile.ownerUserId);
   if (user.role === "admin") return "관리";
-  if (user.familyRole === "owner") return "대표";
-  if (user.familyRole === "manager") return "관리";
+  if (member?.role === "owner") return "대표";
+  if (member?.role === "manager") return "관리";
   return "가족";
 }

@@ -16,7 +16,6 @@ interface ProfilesPageProps {
   onDeleteMedication: (medicationId: string) => void;
   schedules: MedicationSchedule[];
   temporaryMedications: TemporaryMedication[];
-  onProfileChange: (profileId: string) => void;
 }
 
 export function ProfilesPage({
@@ -27,7 +26,6 @@ export function ProfilesPage({
   onDeleteMedication,
   schedules,
   temporaryMedications,
-  onProfileChange,
 }: ProfilesPageProps): ReactElement {
   return (
     <section className="page-grid">
@@ -37,7 +35,6 @@ export function ProfilesPage({
           familyMembers={familyMembers}
           medications={medications.filter((medication) => medication.careProfileId === profile.id)}
           onDeleteMedication={onDeleteMedication}
-          onProfileChange={onProfileChange}
           profile={profile}
           schedules={schedules}
           selected={currentProfileId === profile.id}
@@ -52,7 +49,6 @@ function ProfileCard({
   familyMembers,
   medications,
   onDeleteMedication,
-  onProfileChange,
   profile,
   schedules,
   selected,
@@ -61,7 +57,6 @@ function ProfileCard({
   familyMembers: FamilyMember[];
   medications: Medication[];
   onDeleteMedication: (medicationId: string) => void;
-  onProfileChange: (profileId: string) => void;
   profile: CareProfile;
   schedules: MedicationSchedule[];
   selected: boolean;
@@ -90,13 +85,7 @@ function ProfileCard({
           ))}
         </ul>
         <div className="profile-actions">
-          <button
-            className={selected ? "primary-button" : "ghost-button"}
-            onClick={() => onProfileChange(profile.id)}
-            type="button"
-          >
-            {selected ? "확인 중" : "이 프로필 보기"}
-          </button>
+          {selected && <span className="profile-active-badge">현재 보고 있음</span>}
           <button
             className="ghost-button"
             onClick={() => setIsReportOpen(true)}

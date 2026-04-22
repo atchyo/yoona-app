@@ -47,6 +47,7 @@ export const familyMembers: FamilyMember[] = [
     role: "owner",
     displayName: "김정웅",
     email: "jungwoong@optime.family",
+    accessibleProfileIds: ["profile-self", "profile-mother", "profile-pet"],
   },
   {
     id: "member-mom",
@@ -55,6 +56,7 @@ export const familyMembers: FamilyMember[] = [
     role: "member",
     displayName: "공윤아",
     email: "yoona@optime.family",
+    accessibleProfileIds: ["profile-mother"],
   },
 ];
 

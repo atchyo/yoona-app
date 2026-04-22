@@ -69,7 +69,7 @@ export function App(): ReactElement {
   );
   const [scans, setScans] = useState<OcrScan[]>(() => loadScans([]));
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>(() =>
-    migrateDemoFamilyMembers(loadFamilyMembers(seedFamilyMembers)),
+    migrateDemoFamilyMembers(loadFamilyMembers(seedFamilyMembers), migrateDemoCareProfiles(loadCareProfiles(seedCareProfiles))),
   );
   const [logs, setLogs] = useState<MedicationLog[]>([]);
 
@@ -80,9 +80,13 @@ export function App(): ReactElement {
       seedCareProfiles[0],
     [careProfileList, currentProfileId],
   );
-  const displayCareProfiles = useMemo(
-    () => careProfileList.map((profile) => displayProfileForUser(profile, user, familyMembers)),
+  const accessibleCareProfiles = useMemo(
+    () => profilesAvailableForViewing(careProfileList, user, familyMembers),
     [careProfileList, familyMembers, user],
+  );
+  const displayCareProfiles = useMemo(
+    () => accessibleCareProfiles.map((profile) => displayProfileForUser(profile, user, familyMembers)),
+    [accessibleCareProfiles, familyMembers, user],
   );
   const registrationCareProfiles = useMemo(
     () => profilesAvailableForMedicationRegistration(careProfileList, user).map((profile) =>
@@ -94,14 +98,6 @@ export function App(): ReactElement {
     () => displayProfileForUser(currentProfile, user, familyMembers),
     [currentProfile, familyMembers, user],
   );
-  const loggedInUserProfile = useMemo(() => {
-    const selfProfile =
-      careProfileList.find((profile) => profile.ownerUserId === user?.id) ||
-      careProfileList.find((profile) => profile.type === "self") ||
-      currentProfile;
-    return displayProfileForUser(selfProfile, user, familyMembers);
-  }, [careProfileList, currentProfile, familyMembers, user]);
-
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     saveTheme(theme);
@@ -200,6 +196,15 @@ export function App(): ReactElement {
     }
   }, [authResolved, route, user]);
 
+  useEffect(() => {
+    if (!user || !accessibleCareProfiles.length) return;
+    if (accessibleCareProfiles.some((profile) => profile.id === currentProfileId)) return;
+
+    const nextProfileId = defaultProfileIdForUser(accessibleCareProfiles, user, "");
+    saveCurrentProfileId(nextProfileId);
+    setCurrentProfileId(nextProfileId);
+  }, [accessibleCareProfiles, currentProfileId, user]);
+
   function navigate(nextRoute: Route): void {
     if (!user && nextRoute !== "/login") {
       pushRoute("/login");
@@ -244,7 +249,11 @@ export function App(): ReactElement {
   }
 
   function selectDefaultProfileForUser(nextUser: DemoUser): void {
-    const nextProfileId = defaultProfileIdForUser(careProfileList, nextUser, "");
+    const nextProfileId = defaultProfileIdForUser(
+      profilesAvailableForViewing(careProfileList, nextUser, familyMembers),
+      nextUser,
+      "",
+    );
     saveCurrentProfileId(nextProfileId);
     setCurrentProfileId(nextProfileId);
   }
@@ -371,9 +380,12 @@ export function App(): ReactElement {
 
   return (
     <AppShell
+      availableProfiles={displayCareProfiles}
       currentProfile={displayCurrentProfile}
+      familyMembers={familyMembers}
       onLogout={() => void handleLogout()}
       onNavigate={navigate}
+      onProfileChange={handleProfileChange}
       onThemeToggle={() => setTheme(theme === "light" ? "dark" : "light")}
       route={route}
       theme={theme}
@@ -381,7 +393,7 @@ export function App(): ReactElement {
     >
       {route === "/" && (
         <DashboardPage
-          currentProfile={loggedInUserProfile}
+          currentProfile={displayCurrentProfile}
           medications={medications}
           onNavigateScan={() => navigate("/scan")}
           scans={scans}
@@ -403,21 +415,20 @@ export function App(): ReactElement {
           familyMembers={familyMembers}
           medications={medications}
           onDeleteMedication={handleDeleteMedication}
-          onProfileChange={handleProfileChange}
           schedules={medicationSchedules}
           temporaryMedications={temporaryMedications}
         />
       )}
       {route === "/reminders" && (
         <RemindersPage
-          currentProfile={loggedInUserProfile}
+          currentProfile={displayCurrentProfile}
           medications={medications}
           onMarkTaken={handleMarkTaken}
           schedules={medicationSchedules}
         />
       )}
       {route === "/chat" && (
-        <RuleChatPage currentProfile={loggedInUserProfile} medications={medications} />
+        <RuleChatPage currentProfile={displayCurrentProfile} medications={medications} />
       )}
       {route === "/family" && (
         <FamilyAdminPage
@@ -517,6 +528,25 @@ function profilesAvailableForMedicationRegistration(
   return ownProfiles.length ? ownProfiles : profiles.filter((profile) => profile.name === "나");
 }
 
+function profilesAvailableForViewing(
+  profiles: CareProfile[],
+  user: DemoUser | null,
+  familyMembers: FamilyMember[],
+): CareProfile[] {
+  if (!user) return [];
+  if (user.role === "admin" || user.familyRole === "owner" || user.familyRole === "manager") {
+    return profiles;
+  }
+
+  const member = familyMembers.find((item) => item.userId === user.id);
+  const ownProfileIds = profiles
+    .filter((profile) => profile.ownerUserId === user.id)
+    .map((profile) => profile.id);
+  const allowedProfileIds = new Set([...(member?.accessibleProfileIds || []), ...ownProfileIds]);
+
+  return profiles.filter((profile) => allowedProfileIds.has(profile.id));
+}
+
 function defaultProfileIdForUser(
   profiles: CareProfile[],
   user: DemoUser | null,
@@ -545,13 +575,22 @@ function mapSupabaseUser(user: {
   };
 }
 
-function migrateDemoFamilyMembers(members: FamilyMember[]): FamilyMember[] {
+function migrateDemoFamilyMembers(members: FamilyMember[], profiles: CareProfile[]): FamilyMember[] {
   return members.map((member) => {
+    const ownProfileIds = profiles
+      .filter((profile) => profile.ownerUserId === member.userId)
+      .map((profile) => profile.id);
+    const accessibleProfileIds =
+      member.role === "owner" || member.role === "manager"
+        ? profiles.map((profile) => profile.id)
+        : Array.from(new Set([...(member.accessibleProfileIds || []), ...ownProfileIds]));
+
     if (member.userId === "user-owner" && member.displayName === "가족 대표") {
       return {
         ...member,
         displayName: "김정웅",
         email: member.email === "owner@optime.family" ? "jungwoong@optime.family" : member.email,
+        accessibleProfileIds,
       };
     }
 
@@ -560,10 +599,11 @@ function migrateDemoFamilyMembers(members: FamilyMember[]): FamilyMember[] {
         ...member,
         displayName: "공윤아",
         email: member.email === "member@optime.family" ? "yoona@optime.family" : member.email,
+        accessibleProfileIds,
       };
     }
 
-    return member;
+    return { ...member, accessibleProfileIds };
   });
 }
 

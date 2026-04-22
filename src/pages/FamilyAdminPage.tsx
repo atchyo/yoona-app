@@ -75,8 +75,20 @@ export function FamilyAdminPage({
       displayName: member.displayName,
       email: member.email,
       role: member.role,
+      accessibleProfileIds: normalizedAccessibleProfileIds(member, careProfiles),
     });
     setSavedMemberId(member.id);
+  }
+
+  function toggleProfileAccess(member: FamilyMember, profileId: string): void {
+    const ownProfileIds = ownProfileIdsForMember(member, careProfiles);
+    const nextIds = member.accessibleProfileIds.includes(profileId)
+      ? member.accessibleProfileIds.filter((id) => id !== profileId)
+      : [...member.accessibleProfileIds, profileId];
+
+    updateDraftMember(member.id, {
+      accessibleProfileIds: Array.from(new Set([...nextIds, ...ownProfileIds])),
+    });
   }
 
   function updatePetForm(field: keyof typeof petForm, value: string): void {
@@ -287,6 +299,31 @@ export function FamilyAdminPage({
                   </select>
                 </label>
               </div>
+              <div className="member-access-block">
+                <strong>다른 가족 정보 보기 권한</strong>
+                {member.role === "owner" || member.role === "manager" ? (
+                  <p className="muted">이 역할은 가족 전체 프로필을 기본으로 볼 수 있습니다.</p>
+                ) : (
+                  <div className="access-chip-list">
+                    {careProfiles.map((profile) => {
+                      const ownProfileIds = ownProfileIdsForMember(member, careProfiles);
+                      const isOwnProfile = ownProfileIds.includes(profile.id);
+                      const checked = normalizedAccessibleProfileIds(member, careProfiles).includes(profile.id);
+                      return (
+                        <label className={checked ? "access-chip is-selected" : "access-chip"} key={`${member.id}-${profile.id}`}>
+                          <input
+                            checked={checked}
+                            disabled={isOwnProfile}
+                            onChange={() => toggleProfileAccess(member, profile.id)}
+                            type="checkbox"
+                          />
+                          <span>{profile.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </article>
           ))}
         </div>
@@ -491,4 +528,16 @@ function petSummaryLine(profile: CareProfile): string {
   ]
     .filter(Boolean)
     .join(" · ") || "등록된 상세 정보 없음";
+}
+
+function ownProfileIdsForMember(member: FamilyMember, profiles: CareProfile[]): string[] {
+  return profiles.filter((profile) => profile.ownerUserId === member.userId).map((profile) => profile.id);
+}
+
+function normalizedAccessibleProfileIds(member: FamilyMember, profiles: CareProfile[]): string[] {
+  if (member.role === "owner" || member.role === "manager") {
+    return profiles.map((profile) => profile.id);
+  }
+
+  return Array.from(new Set([...(member.accessibleProfileIds || []), ...ownProfileIdsForMember(member, profiles)]));
 }
