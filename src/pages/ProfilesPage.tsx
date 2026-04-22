@@ -91,7 +91,7 @@ function ProfileCard({
             onClick={() => setIsReportOpen(true)}
             type="button"
           >
-            레포트 출력
+            레포트 보기
           </button>
         </div>
       </article>
