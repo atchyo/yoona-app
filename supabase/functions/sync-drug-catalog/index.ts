@@ -44,23 +44,20 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    if (authHeader) {
-      const { data: userData, error: userError } = await anonClient.auth.getUser();
-      if (userError || !userData.user) {
-        return jsonResponse({ ok: false, error: "로그인 상태를 확인하지 못했습니다." });
-      }
+    if (!authHeader) {
+      return jsonResponse({ ok: false, error: "로그인 상태를 확인하지 못했습니다." });
+    }
 
-      const { data: memberData, error: memberError } = await anonClient
-        .from("family_members")
-        .select("role")
-        .eq("user_id", userData.user.id)
-        .in("role", ["owner", "manager"])
-        .limit(1);
+    const { data: userData, error: userError } = await anonClient.auth.getUser();
+    if (userError || !userData.user) {
+      return jsonResponse({ ok: false, error: "로그인 상태를 확인하지 못했습니다." });
+    }
 
-      if (memberError) return jsonResponse({ ok: false, error: memberError.message });
-      if (!memberData?.length) {
-        return jsonResponse({ ok: false, error: "가족대표 또는 가족관리자만 약 DB를 동기화할 수 있습니다." });
-      }
+    const { data: canSync, error: permissionError } = await anonClient.rpc("can_sync_drug_catalog");
+
+    if (permissionError) return jsonResponse({ ok: false, error: permissionError.message });
+    if (!canSync) {
+      return jsonResponse({ ok: false, error: "가족대표 또는 가족관리자만 약 DB를 동기화할 수 있습니다." });
     }
 
     const body = (await req.json().catch(() => ({}))) as SyncOptions;
