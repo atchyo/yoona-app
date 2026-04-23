@@ -23,6 +23,7 @@ interface FamilyAdminPageProps {
   temporaryMedications: TemporaryMedication[];
   user: DemoUser;
   workspace: FamilyWorkspace;
+  onSyncDrugCatalog: () => Promise<Array<{ source: string; fetchedCount: number; upsertedCount: number }>> | Array<{ source: string; fetchedCount: number; upsertedCount: number }>;
 }
 
 export function FamilyAdminPage({
@@ -37,6 +38,7 @@ export function FamilyAdminPage({
   temporaryMedications,
   user,
   workspace,
+  onSyncDrugCatalog,
 }: FamilyAdminPageProps): ReactElement {
   const [draftMembers, setDraftMembers] = useState<FamilyMember[]>(familyMembers);
   const [savedMemberId, setSavedMemberId] = useState("");
@@ -56,6 +58,8 @@ export function FamilyAdminPage({
     forbiddenFoods: "",
   });
   const [petSaveNote, setPetSaveNote] = useState("");
+  const [isSyncingCatalog, setIsSyncingCatalog] = useState(false);
+  const [catalogSyncNote, setCatalogSyncNote] = useState("");
 
   useEffect(() => {
     setDraftMembers(familyMembers);
@@ -70,6 +74,22 @@ export function FamilyAdminPage({
     setDraftMembers((current) =>
       current.map((member) => (member.id === memberId ? { ...member, ...patch } : member)),
     );
+  }
+
+  async function syncDrugCatalog(): Promise<void> {
+    setCatalogSyncNote("");
+    setIsSyncingCatalog(true);
+    try {
+      const summaries = await onSyncDrugCatalog();
+      const line = summaries
+        .map((summary) => `${sourceSyncLabel(summary.source)} ${summary.upsertedCount}건`)
+        .join(" · ");
+      setCatalogSyncNote(line ? `공식 약 DB 동기화 완료: ${line}` : "공식 약 DB 동기화 완료");
+    } catch (error) {
+      setCatalogSyncNote(error instanceof Error ? error.message : "공식 약 DB 동기화 중 문제가 발생했습니다.");
+    } finally {
+      setIsSyncingCatalog(false);
+    }
   }
 
   async function saveMember(member: FamilyMember): Promise<void> {
@@ -253,6 +273,27 @@ export function FamilyAdminPage({
           <div className="stat-card"><span>임시약</span><strong>{temporaryMedications.length}</strong></div>
           <div className="stat-card"><span>OCR 기록</span><strong>{scans.length}</strong></div>
         </div>
+        {(user.familyRole === "owner" || user.familyRole === "manager") && (
+          <div className="catalog-sync-panel">
+            <div>
+              <strong>공식 약 DB 동기화</strong>
+              <p className="muted">
+                식약처 의약품 허가정보, e약은요, 건강기능식품정보를 검색 카탈로그로 적재합니다.
+              </p>
+            </div>
+            <div className="catalog-sync-actions">
+              <button
+                className="primary-button"
+                disabled={isSyncingCatalog}
+                onClick={() => void syncDrugCatalog()}
+                type="button"
+              >
+                {isSyncingCatalog ? "동기화 중..." : "약 DB 동기화"}
+              </button>
+              {catalogSyncNote && <span className="save-note">{catalogSyncNote}</span>}
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="card">
@@ -532,6 +573,13 @@ function roleLabel(role: FamilyRole): string {
   if (role === "owner") return "가족대표";
   if (role === "manager") return "가족관리자";
   return "가족구성원";
+}
+
+function sourceSyncLabel(source: string): string {
+  if (source === "mfds_permit") return "허가정보";
+  if (source === "mfds_easy") return "e약은요";
+  if (source === "mfds_health") return "건강기능식품";
+  return source;
 }
 
 function petSummaryLine(profile: CareProfile): string {

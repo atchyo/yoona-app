@@ -1,17 +1,34 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
+import {
+  compareMatches,
+  compactTextList,
+  dedupeMatches,
+  DrugCatalogRow,
+  DrugMatch,
+  escapeLikePattern,
+  extractItems,
+  fetchDataGoKrJson,
+  looksLikeSupplementQuery,
+  normalizeItems,
+  normalizeName,
+  parseIngredients,
+} from "../_shared/drugCatalog.ts";
 
-interface DrugMatch {
-  id: string;
+interface CatalogSearchRow {
   source: string;
-  productName: string;
-  manufacturer?: string;
+  source_record_id: string;
+  category: "drug" | "supplement";
+  product_name: string;
+  manufacturer: string | null;
   ingredients: Array<{ name: string; amount?: string }>;
-  dosageForm?: string;
-  efficacy?: string;
-  usage?: string;
+  dosage_form: string | null;
+  efficacy: string | null;
+  usage: string | null;
   warnings: string[];
   interactions: string[];
-  confidence: number;
+  search_text: string;
+  search_compact: string;
 }
 
 interface HealthFunctionalFoodListItem {
@@ -19,14 +36,13 @@ interface HealthFunctionalFoodListItem {
   productName: string;
   manufacturer?: string;
   statementNo?: string;
-  absoluteIndex: number;
 }
 
 let healthFunctionalFoodCache:
   | { expiresAt: number; items: HealthFunctionalFoodListItem[] }
   | null = null;
 const HEALTH_FUNCTIONAL_FOOD_PAGE_SIZE = 100;
-const HEALTH_FUNCTIONAL_FOOD_MAX_PAGES = 25;
+const HEALTH_FUNCTIONAL_FOOD_MAX_PAGES = 200;
 const HEALTH_FUNCTIONAL_FOOD_CACHE_TTL_MS = 1000 * 60 * 30;
 
 Deno.serve(async (req) => {
@@ -38,24 +54,112 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: "query is required" }, 400);
   }
 
-  const mfdsPermitMatches = await searchMfdsPermit(query);
-  const mfdsEasyMatches = await searchMfdsEasyDrug(query);
-  const healthFunctionalFoodMatches =
-    looksLikeSupplementQuery(query) || mfdsPermitMatches.length + mfdsEasyMatches.length < 2
-      ? await searchHealthFunctionalFood(query)
-      : [];
+  const trimmedQuery = query.trim();
+  const adminClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
 
-  const matches = [
+  const catalogMatches = await searchCatalog(adminClient, trimmedQuery);
+  if (catalogMatches.length >= 8) {
+    return jsonResponse({ matches: catalogMatches.slice(0, 10) });
+  }
+
+  const mfdsPermitMatches = await searchMfdsPermit(trimmedQuery);
+  const mfdsEasyMatches = await searchMfdsEasyDrug(trimmedQuery);
+  const healthFunctionalFoodMatches =
+    looksLikeSupplementQuery(trimmedQuery) || mfdsPermitMatches.length + mfdsEasyMatches.length < 2
+      ? await searchHealthFunctionalFood(trimmedQuery)
+      : [];
+  const rxNormMatches = await searchRxNorm(trimmedQuery);
+
+  const liveMatches = dedupeMatches([
     ...mfdsPermitMatches,
     ...mfdsEasyMatches,
     ...healthFunctionalFoodMatches,
-    ...(await searchRxNorm(query)),
-  ]
-    .sort((a, b) => compareMatches(query, a, b))
+    ...rxNormMatches,
+  ]);
+
+  if (liveMatches.length) {
+    await upsertLiveMatchesToCatalog(adminClient, liveMatches);
+  }
+
+  const matches = dedupeMatches([...catalogMatches, ...liveMatches])
+    .sort((a, b) => compareMatches(trimmedQuery, a, b))
     .slice(0, 10);
 
   return jsonResponse({ matches });
 });
+
+async function searchCatalog(
+  adminClient: ReturnType<typeof createClient>,
+  query: string,
+): Promise<DrugMatch[]> {
+  const rawLike = escapeLikePattern(query);
+  const compactLike = escapeLikePattern(normalizeName(query));
+  if (!rawLike && !compactLike) return [];
+
+  const filters = [];
+  if (rawLike) filters.push(`search_text.ilike.%${rawLike}%`);
+  if (compactLike) filters.push(`search_compact.ilike.%${compactLike}%`);
+  if (!filters.length) return [];
+
+  const { data, error } = await adminClient
+    .from("drug_catalog_items")
+    .select(
+      "source, source_record_id, category, product_name, manufacturer, ingredients, dosage_form, efficacy, usage, warnings, interactions, search_text, search_compact",
+    )
+    .or(filters.join(","))
+    .limit(30)
+    .returns<CatalogSearchRow[]>();
+
+  if (error || !data?.length) return [];
+
+  return data
+    .map((row) => toCatalogMatch(query, row))
+    .sort((left, right) => compareMatches(query, left, right));
+}
+
+function toCatalogMatch(query: string, row: CatalogSearchRow): DrugMatch {
+  const exactBonus =
+    normalizeName(row.product_name) === normalizeName(query)
+      ? 0.07
+      : normalizeName(row.product_name).startsWith(normalizeName(query))
+        ? 0.04
+        : 0;
+
+  const categoryBonus =
+    looksLikeSupplementQuery(query) && row.category === "supplement" ? 0.03 : 0;
+
+  return {
+    id: `${row.source}-${row.source_record_id}`,
+    source: row.source,
+    productName: row.product_name,
+    manufacturer: row.manufacturer || undefined,
+    ingredients: row.ingredients || [],
+    dosageForm: row.dosage_form || undefined,
+    efficacy: row.efficacy || undefined,
+    usage: row.usage || undefined,
+    warnings: row.warnings || [],
+    interactions: row.interactions || [],
+    confidence: Math.min(0.98, baseConfidenceBySource(row.source) + exactBonus + categoryBonus),
+  };
+}
+
+function baseConfidenceBySource(source: string): number {
+  switch (source) {
+    case "mfds_permit":
+      return 0.9;
+    case "mfds_easy":
+      return 0.78;
+    case "mfds_health":
+      return 0.84;
+    case "rxnorm":
+      return 0.66;
+    default:
+      return 0.55;
+  }
+}
 
 async function searchMfdsPermit(query: string): Promise<DrugMatch[]> {
   const serviceKey = Deno.env.get("DATA_GO_KR_SERVICE_KEY");
@@ -68,14 +172,14 @@ async function searchMfdsPermit(query: string): Promise<DrugMatch[]> {
     {
       type: "json",
       item_name: query,
-      numOfRows: "5",
+      numOfRows: "10",
       pageNo: "1",
     },
   );
   const items = normalizeItems(extractItems(payload));
 
   return items.map((item: Record<string, string>, index: number) => ({
-    id: `mfds-permit-${item.ITEM_SEQ || index}`,
+    id: `mfds_permit-${item.ITEM_SEQ || index}`,
     source: "mfds_permit",
     productName: item.ITEM_NAME || query,
     manufacturer: item.ENTP_NAME,
@@ -100,14 +204,14 @@ async function searchMfdsEasyDrug(query: string): Promise<DrugMatch[]> {
     {
       type: "json",
       itemName: query,
-      numOfRows: "5",
+      numOfRows: "10",
       pageNo: "1",
     },
   );
   const items = normalizeItems(extractItems(payload));
 
   return items.map((item: Record<string, string>, index: number) => ({
-    id: `mfds-easy-${item.itemSeq || index}`,
+    id: `mfds_easy-${item.itemSeq || index}`,
     source: "mfds_easy",
     productName: item.itemName || query,
     manufacturer: item.entpName,
@@ -128,7 +232,7 @@ async function searchHealthFunctionalFood(query: string): Promise<DrugMatch[]> {
   const items = await loadHealthFunctionalFoodIndex(serviceKey);
   const normalizedQuery = normalizeName(query);
 
-  const candidates = items
+  return items
     .filter((item) => {
       const normalizedProductName = normalizeName(item.productName);
       const normalizedManufacturer = normalizeName(item.manufacturer || "");
@@ -137,16 +241,18 @@ async function searchHealthFunctionalFood(query: string): Promise<DrugMatch[]> {
         normalizedManufacturer.includes(normalizedQuery)
       );
     })
-    .sort((left, right) => compareMatches(query, toHealthListMatch(left), toHealthListMatch(right)))
+    .map((item) => ({
+      id: item.id,
+      source: "mfds_health",
+      productName: item.productName,
+      manufacturer: item.manufacturer,
+      ingredients: [],
+      warnings: [],
+      interactions: [],
+      confidence: 0.62,
+    }))
+    .sort((left, right) => compareMatches(query, left, right))
     .slice(0, 5);
-
-  const detailedMatches = await Promise.all(
-    candidates.map((item) => fetchHealthFunctionalFoodDetail(item, serviceKey)),
-  );
-
-  return detailedMatches
-    .filter((match): match is DrugMatch => Boolean(match))
-    .sort((a, b) => compareMatches(query, a, b));
 }
 
 async function searchRxNorm(query: string): Promise<DrugMatch[]> {
@@ -158,10 +264,9 @@ async function searchRxNorm(query: string): Promise<DrugMatch[]> {
   const response = await fetch(url);
   if (!response.ok) return [];
   const payload = await response.json();
-  const candidates = (payload?.approximateGroup?.candidate || []).filter((candidate: Record<string, string>) => {
-    const score = Number(candidate.score || 0);
-    return score >= 55;
-  });
+  const candidates = (payload?.approximateGroup?.candidate || []).filter(
+    (candidate: Record<string, string>) => Number(candidate.score || 0) >= 55,
+  );
 
   return candidates.map((candidate: Record<string, string>) => ({
     id: `rxnorm-${candidate.rxcui}`,
@@ -174,142 +279,55 @@ async function searchRxNorm(query: string): Promise<DrugMatch[]> {
   }));
 }
 
-function normalizeItems(items: unknown): Array<Record<string, string>> {
-  if (!items) return [];
-  if (Array.isArray(items)) return items as Array<Record<string, string>>;
-  if (Array.isArray((items as { item?: unknown[] }).item)) {
-    return (items as { item: Array<Record<string, string>> }).item;
-  }
-  if ((items as { item?: unknown }).item) return [(items as { item: Record<string, string> }).item];
-  return [];
+async function upsertLiveMatchesToCatalog(
+  adminClient: ReturnType<typeof createClient>,
+  matches: DrugMatch[],
+): Promise<void> {
+  const rows = matches
+    .filter((match) => match.source === "mfds_permit" || match.source === "mfds_easy" || match.source === "mfds_health")
+    .map(toCatalogRowFromMatch);
+
+  if (!rows.length) return;
+
+  await adminClient.from("drug_catalog_items").upsert(rows, {
+    onConflict: "source,source_record_id",
+  });
 }
 
-function extractItems(payload: unknown): unknown {
-  const body =
-    (payload as { response?: { body?: { items?: unknown } } })?.response?.body ||
-    (payload as { body?: { items?: unknown } })?.body;
-
-  return body?.items;
-}
-
-function extractTotalCount(payload: unknown): number {
-  const rawValue =
-    (payload as { response?: { body?: { totalCount?: string | number } } })?.response?.body
-      ?.totalCount ||
-    (payload as { body?: { totalCount?: string | number } })?.body?.totalCount ||
-    0;
-
-  return Number(rawValue || 0);
-}
-
-async function fetchDataGoKrJson(
-  baseUrl: string,
-  serviceKeyName: string,
-  serviceKey: string,
-  params: Record<string, string>,
-): Promise<unknown> {
-  const keyCandidates = Array.from(
-    new Set([serviceKey, safeDecode(serviceKey)]).values(),
-  ).filter(Boolean);
-
-  for (const key of keyCandidates) {
-    const url = new URL(baseUrl);
-    Object.entries(params).forEach(([name, value]) => {
-      url.searchParams.set(name, value);
-    });
-    url.searchParams.set(serviceKeyName, key);
-
-    const response = await fetch(url);
-    if (!response.ok) continue;
-
-    const payload = await response.json();
-    const resultCode = String(
-      (payload as { response?: { header?: { resultCode?: string } } })?.response?.header?.resultCode ||
-        (payload as { header?: { resultCode?: string } })?.header?.resultCode ||
-        "",
-    );
-
-    if (resultCode && resultCode !== "00") continue;
-    return payload;
-  }
-
-  return {};
-}
-
-function safeDecode(value: string): string {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
-}
-
-function parseIngredients(value: string): Array<{ name: string; amount?: string }> {
-  return value
-    .split(/[,\n;]/)
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .map((part) => ({ name: part }));
-}
-
-function compactTextList(values: Array<string | undefined>): string[] {
-  return values.map((value) => value?.trim()).filter(Boolean) as string[];
-}
-
-function parseFunctionalClaims(value: string): Array<{ name: string; amount?: string }> {
-  const cleaned = value
-    .replace(/<[^>]+>/g, " ")
-    .replace(/[\r\n]+/g, " ")
+function toCatalogRowFromMatch(match: DrugMatch): DrugCatalogRow {
+  const sourceRecordId = match.id.replace(/^[^-]+-/, "");
+  const category = match.source === "mfds_health" ? "supplement" : "drug";
+  const searchText = [
+    match.productName,
+    match.manufacturer || "",
+    ...match.ingredients.map((item) => [item.name, item.amount].filter(Boolean).join(" ")),
+    match.efficacy || "",
+    match.usage || "",
+    ...match.warnings,
+    ...match.interactions,
+  ]
+    .join(" ")
+    .replace(/\s+/g, " ")
     .trim();
 
-  if (!cleaned) return [];
-
-  return cleaned
-    .split(/[,.·]/)
-    .map((part) => part.trim())
-    .filter((part) => part.length > 1)
-    .slice(0, 3)
-    .map((part) => ({ name: part }));
-}
-
-function compareMatches(query: string, left: DrugMatch, right: DrugMatch): number {
-  const scoreGap = matchPriority(query, right.productName) - matchPriority(query, left.productName);
-  if (scoreGap !== 0) return scoreGap;
-  return right.confidence - left.confidence;
-}
-
-function matchPriority(query: string, productName: string): number {
-  const normalizedQuery = normalizeName(query);
-  const normalizedProductName = normalizeName(productName);
-
-  if (!normalizedQuery || !normalizedProductName) return 0;
-  if (normalizedProductName === normalizedQuery) return 5;
-  if (normalizedProductName.startsWith(normalizedQuery)) return 4;
-  if (normalizedProductName.includes(normalizedQuery)) return 3;
-  if (normalizedQuery.split(/\s+/).every((token) => normalizedProductName.includes(token))) return 2;
-  return 1;
-}
-
-function normalizeName(value: string): string {
-  return value.toLowerCase().replace(/[\s\-_/()[\].,]/g, "");
-}
-
-function looksLikeSupplementQuery(query: string): boolean {
-  return /(비타민|오메가|마그네슘|유산균|프로바이오틱|루테인|아연|칼슘|철분|밀크씨슬|홍삼|크릴|비오틴|콜라겐|코큐텐|코엔자임|글루코사민|msm|vitamin|omega|probiotic|magnesium|lutein|zinc|calcium|iron|collagen)/i.test(
-    query,
-  );
-}
-
-function toHealthListMatch(item: HealthFunctionalFoodListItem): DrugMatch {
   return {
-    id: item.id,
-    source: "mfds_health",
-    productName: item.productName,
-    manufacturer: item.manufacturer,
-    ingredients: [],
-    warnings: [],
-    interactions: [],
-    confidence: 0.62,
+    source: match.source,
+    source_record_id: sourceRecordId,
+    category,
+    product_name: match.productName,
+    normalized_product_name: normalizeName(match.productName),
+    manufacturer: match.manufacturer || null,
+    normalized_manufacturer: normalizeName(match.manufacturer || ""),
+    ingredients: match.ingredients,
+    dosage_form: match.dosageForm || null,
+    efficacy: match.efficacy || null,
+    usage: match.usage || null,
+    warnings: match.warnings,
+    interactions: match.interactions,
+    search_text: searchText,
+    search_compact: normalizeName(searchText),
+    source_payload: {},
+    last_synced_at: new Date().toISOString(),
   };
 }
 
@@ -321,7 +339,6 @@ async function loadHealthFunctionalFoodIndex(
   }
 
   const items: HealthFunctionalFoodListItem[] = [];
-  let totalCount = Number.POSITIVE_INFINITY;
 
   for (let pageNo = 1; pageNo <= HEALTH_FUNCTIONAL_FOOD_MAX_PAGES; pageNo += 1) {
     const payload = await fetchDataGoKrJson(
@@ -338,19 +355,16 @@ async function loadHealthFunctionalFoodIndex(
     const pageItems = normalizeItems(extractItems(payload));
     if (!pageItems.length) break;
 
-    totalCount = extractTotalCount(payload) || totalCount;
-
     pageItems.forEach((item: Record<string, string>, index: number) => {
       items.push({
-        id: `mfds-health-${item.STTEMNT_NO || `${pageNo}-${index}`}`,
+        id: `mfds_health-${item.STTEMNT_NO || `${pageNo}-${index}`}`,
         productName: item.PRDUCT || "",
         manufacturer: item.ENTRPS,
         statementNo: item.STTEMNT_NO,
-        absoluteIndex: (pageNo - 1) * HEALTH_FUNCTIONAL_FOOD_PAGE_SIZE + index,
       });
     });
 
-    if (items.length >= totalCount || pageItems.length < HEALTH_FUNCTIONAL_FOOD_PAGE_SIZE) {
+    if (pageItems.length < HEALTH_FUNCTIONAL_FOOD_PAGE_SIZE) {
       break;
     }
   }
@@ -361,38 +375,4 @@ async function loadHealthFunctionalFoodIndex(
   };
 
   return items;
-}
-
-async function fetchHealthFunctionalFoodDetail(
-  item: HealthFunctionalFoodListItem,
-  serviceKey: string,
-): Promise<DrugMatch | null> {
-  const payload = await fetchDataGoKrJson(
-    "https://apis.data.go.kr/1471000/HtfsInfoService03/getHtfsItem01",
-    "ServiceKey",
-    serviceKey,
-    {
-      type: "json",
-      numOfRows: "1",
-      pageNo: String(item.absoluteIndex + 1),
-    },
-  );
-
-  const detail = normalizeItems(extractItems(payload))[0] as Record<string, string> | undefined;
-  const productName = detail?.PRDUCT || item.productName;
-  if (!productName) return null;
-
-  return {
-    id: item.id,
-    source: "mfds_health",
-    productName,
-    manufacturer: detail?.ENTRPS || item.manufacturer,
-    ingredients: parseFunctionalClaims(detail?.MAIN_FNCTN || detail?.BASE_STANDARD || ""),
-    dosageForm: detail?.SUNGSANG,
-    efficacy: detail?.MAIN_FNCTN,
-    usage: detail?.SRV_USE,
-    warnings: compactTextList([detail?.INTAKE_HINT1, detail?.PRSRV_PD, detail?.DISTB_PD]),
-    interactions: [],
-    confidence: normalizeName(productName) === normalizeName(item.productName) ? 0.8 : 0.68,
-  };
 }

@@ -1220,6 +1220,27 @@ textarea {
   font-size: 1.6rem;
 }
 
+.catalog-sync-panel {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.catalog-sync-panel strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.catalog-sync-actions {
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+
 .table-wrap {
   overflow-x: auto;
 }
@@ -1721,6 +1742,7 @@ td select {
   .member-edit-head,
   .split-heading,
   .pet-summary-head,
+  .catalog-sync-panel,
   .photo-preview figcaption {
     align-items: stretch;
     flex-direction: column;
@@ -1728,6 +1750,8 @@ td select {
 
   .member-edit-head .table-action,
   .split-heading button,
+  .catalog-sync-actions,
+  .catalog-sync-actions button,
   .pet-row-actions,
   .pet-row-actions button {
     width: 100%;
