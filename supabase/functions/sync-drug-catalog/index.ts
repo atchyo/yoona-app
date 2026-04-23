@@ -16,14 +16,17 @@ import {
 type SyncSource = "mfds_permit" | "mfds_easy" | "mfds_health";
 
 interface SyncOptions {
+  source?: SyncSource;
   sources?: SyncSource[];
   reset?: boolean;
   pageSize?: number;
   maxPages?: number;
+  startPage?: number;
+  pageCount?: number;
 }
 
 const DEFAULT_PAGE_SIZE = 100;
-const DEFAULT_MAX_PAGES = 200;
+const DEFAULT_PAGE_COUNT = 15;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -56,35 +59,37 @@ Deno.serve(async (req) => {
   if (!memberData?.length) return jsonResponse({ error: "Forbidden" }, 403);
 
   const body = (await req.json().catch(() => ({}))) as SyncOptions;
-  const sources = sanitizeSources(body.sources);
+  const source = sanitizeSource(body.source, body.sources);
+  if (!source) {
+    return jsonResponse({ error: "source is required" }, 400);
+  }
   const reset = Boolean(body.reset);
   const pageSize = clampNumber(body.pageSize, DEFAULT_PAGE_SIZE, 20, 500);
-  const maxPages = clampNumber(body.maxPages, DEFAULT_MAX_PAGES, 1, 2000);
+  const startPage = clampNumber(body.startPage, 1, 1, 100000);
+  const pageCount = clampNumber(body.pageCount ?? body.maxPages, DEFAULT_PAGE_COUNT, 1, 50);
   const serviceKey = Deno.env.get("DATA_GO_KR_SERVICE_KEY");
 
   if (!serviceKey) {
     return jsonResponse({ error: "DATA_GO_KR_SERVICE_KEY is not configured" }, 500);
   }
 
-  const summaries = [];
-  for (const source of sources) {
-    const summary = await syncSource(adminClient, {
-      serviceKey,
-      source,
-      reset,
-      pageSize,
-      maxPages,
-    });
-    summaries.push(summary);
-  }
+  const summary = await syncSource(adminClient, {
+    serviceKey,
+    source,
+    reset,
+    pageSize,
+    startPage,
+    pageCount,
+  });
 
-  return jsonResponse({ sources: summaries });
+  return jsonResponse(summary);
 });
 
-function sanitizeSources(value?: SyncSource[]): SyncSource[] {
+function sanitizeSource(value?: SyncSource, sources?: SyncSource[]): SyncSource | null {
   const allowed: SyncSource[] = ["mfds_permit", "mfds_easy", "mfds_health"];
-  const next = (value || []).filter((item): item is SyncSource => allowed.includes(item));
-  return next.length ? next : allowed;
+  if (value && allowed.includes(value)) return value;
+  const first = (sources || []).find((item): item is SyncSource => allowed.includes(item));
+  return first || null;
 }
 
 function clampNumber(value: number | undefined, fallback: number, min: number, max: number): number {
@@ -100,7 +105,8 @@ async function syncSource(
     source: SyncSource;
     reset: boolean;
     pageSize: number;
-    maxPages: number;
+    startPage: number;
+    pageCount: number;
   },
 ) {
   const { data: runData, error: runError } = await adminClient
@@ -115,7 +121,7 @@ async function syncSource(
   if (runError || !runData) throw new Error(runError?.message || "동기화 기록을 만들지 못했습니다.");
 
   try {
-    if (options.reset) {
+    if (options.reset && options.startPage === 1) {
       const { error } = await adminClient.from("drug_catalog_items").delete().eq("source", options.source);
       if (error) throw new Error(error.message);
     }
@@ -146,6 +152,10 @@ async function syncSource(
       source: options.source,
       fetchedCount: result.fetchedCount,
       upsertedCount: result.rows.length,
+      startPage: options.startPage,
+      nextPage: result.nextPage,
+      hasMore: result.hasMore,
+      totalCount: result.totalCount,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "동기화 중 오류가 발생했습니다.";
@@ -165,8 +175,15 @@ async function fetchCatalogRows(options: {
   serviceKey: string;
   source: SyncSource;
   pageSize: number;
-  maxPages: number;
-}): Promise<{ fetchedCount: number; rows: DrugCatalogRow[] }> {
+  startPage: number;
+  pageCount: number;
+}): Promise<{
+  fetchedCount: number;
+  rows: DrugCatalogRow[];
+  nextPage: number | null;
+  hasMore: boolean;
+  totalCount: number;
+}> {
   switch (options.source) {
     case "mfds_permit":
       return fetchPagedSourceRows({
@@ -196,16 +213,25 @@ async function fetchPagedSourceRows(options: {
   serviceKey: string;
   source: SyncSource;
   pageSize: number;
-  maxPages: number;
+  startPage: number;
+  pageCount: number;
   baseUrl: string;
   serviceKeyName: string;
   mapRow: (item: Record<string, string>, index: number) => DrugCatalogRow | null;
-}): Promise<{ fetchedCount: number; rows: DrugCatalogRow[] }> {
+}): Promise<{
+  fetchedCount: number;
+  rows: DrugCatalogRow[];
+  nextPage: number | null;
+  hasMore: boolean;
+  totalCount: number;
+}> {
   const rows: DrugCatalogRow[] = [];
   let totalCount = Number.POSITIVE_INFINITY;
   let fetchedCount = 0;
+  let lastFetchedPage = options.startPage - 1;
+  let lastPageItemCount = 0;
 
-  for (let pageNo = 1; pageNo <= options.maxPages; pageNo += 1) {
+  for (let pageNo = options.startPage; pageNo < options.startPage + options.pageCount; pageNo += 1) {
     const payload = await fetchDataGoKrJson(
       options.baseUrl,
       options.serviceKeyName,
@@ -222,6 +248,8 @@ async function fetchPagedSourceRows(options: {
 
     totalCount = extractTotalCount(payload) || totalCount;
     fetchedCount += items.length;
+    lastFetchedPage = pageNo;
+    lastPageItemCount = items.length;
 
     items.forEach((item, index) => {
       const row = options.mapRow(item, (pageNo - 1) * options.pageSize + index);
@@ -233,7 +261,19 @@ async function fetchPagedSourceRows(options: {
     }
   }
 
-  return { fetchedCount, rows };
+  const total = Number.isFinite(totalCount) ? totalCount : fetchedCount;
+  const hasMore =
+    lastFetchedPage >= options.startPage &&
+    lastPageItemCount === options.pageSize &&
+    lastFetchedPage * options.pageSize < total;
+
+  return {
+    fetchedCount,
+    rows,
+    nextPage: hasMore ? lastFetchedPage + 1 : null,
+    hasMore,
+    totalCount: total,
+  };
 }
 
 function mapPermitRow(item: Record<string, string>, index: number): DrugCatalogRow | null {

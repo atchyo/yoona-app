@@ -5,6 +5,10 @@ export interface DrugCatalogSyncSummary {
   source: string;
   fetchedCount: number;
   upsertedCount: number;
+  startPage?: number;
+  nextPage?: number | null;
+  hasMore?: boolean;
+  totalCount?: number;
 }
 
 export async function searchDrugDatabase(query: string): Promise<DrugDatabaseMatch[]> {
@@ -32,20 +36,62 @@ export async function syncDrugCatalog(): Promise<DrugCatalogSyncSummary[]> {
     throw new Error("Supabase가 연결되지 않았습니다.");
   }
 
-  const { data, error } = await supabase.functions.invoke("sync-drug-catalog", {
-    body: {
-      sources: ["mfds_permit", "mfds_easy", "mfds_health"],
-      reset: false,
-    },
-  });
+  const sourcePlans = [
+    { source: "mfds_health", pageCount: 12 },
+    { source: "mfds_permit", pageCount: 10 },
+    { source: "mfds_easy", pageCount: 10 },
+  ] as const;
 
-  if (error) {
-    throw new Error(error.message || "약 카탈로그 동기화에 실패했습니다.");
+  const summaries: DrugCatalogSyncSummary[] = [];
+
+  for (const plan of sourcePlans) {
+    let nextPage = 1;
+    let hasMore = true;
+    let fetchedTotal = 0;
+    let upsertedTotal = 0;
+
+    while (hasMore) {
+      const { data, error } = await supabase.functions.invoke("sync-drug-catalog", {
+        body: {
+          source: plan.source,
+          reset: false,
+          startPage: nextPage,
+          pageCount: plan.pageCount,
+          pageSize: 100,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || `${plan.source} 동기화에 실패했습니다.`);
+      }
+
+      if (!data || typeof data !== "object") {
+        throw new Error(`${plan.source} 동기화 응답 형식이 올바르지 않습니다.`);
+      }
+
+      const summary = data as DrugCatalogSyncSummary;
+      fetchedTotal += Number(summary.fetchedCount || 0);
+      upsertedTotal += Number(summary.upsertedCount || 0);
+      hasMore = Boolean(summary.hasMore);
+      nextPage = Number(summary.nextPage || 0);
+
+      if (!hasMore || !nextPage) {
+        summaries.push({
+          source: plan.source,
+          fetchedCount: fetchedTotal,
+          upsertedCount: upsertedTotal,
+          hasMore: false,
+          nextPage: null,
+          totalCount: summary.totalCount,
+        });
+        break;
+      }
+
+      if (fetchedTotal > 100000) {
+        throw new Error(`${plan.source} 동기화가 예상보다 오래 걸려 중단했습니다.`);
+      }
+    }
   }
 
-  if (!Array.isArray(data?.sources)) {
-    throw new Error("동기화 응답 형식이 올바르지 않습니다.");
-  }
-
-  return data.sources as DrugCatalogSyncSummary[];
+  return summaries;
 }
