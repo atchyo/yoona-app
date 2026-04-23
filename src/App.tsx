@@ -228,14 +228,6 @@ export function App(): ReactElement {
     setRoute(nextRoute);
   }
 
-  function handleDemoLogin(nextUser: DemoUser): void {
-    saveUser(nextUser);
-    setUser(nextUser);
-    selectDefaultProfileForUser(nextUser);
-    pushRoute("/");
-    setRoute("/");
-  }
-
   async function handleLogout(): Promise<void> {
     await signOutSupabase();
     clearUser();
@@ -371,7 +363,6 @@ export function App(): ReactElement {
   if (!user) {
     return (
       <LoginPage
-        onDemoLogin={handleDemoLogin}
         onThemeToggle={() => setTheme(theme === "light" ? "dark" : "light")}
         theme={theme}
       />

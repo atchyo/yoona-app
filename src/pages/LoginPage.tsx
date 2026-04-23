@@ -1,18 +1,15 @@
 import type { ReactElement } from "react";
 import { isSupabaseConfigured } from "../config";
-import { demoUsers } from "../data/demoData";
 import { signInWithProvider } from "../services/supabaseClient";
 import { ThemeToggle } from "../components/ThemeToggle";
-import type { DemoUser, ThemeMode } from "../types";
+import type { ThemeMode } from "../types";
 
 interface LoginPageProps {
-  onDemoLogin: (user: DemoUser) => void;
   onThemeToggle: () => void;
   theme: ThemeMode;
 }
 
 export function LoginPage({
-  onDemoLogin,
   onThemeToggle,
   theme,
 }: LoginPageProps): ReactElement {
@@ -79,17 +76,6 @@ export function LoginPage({
             </svg>
             Google 로그인
           </button>
-          <div className="login-divider"><span>데모 계정</span></div>
-          {demoUsers.map((demoUser) => (
-            <button
-              className="ghost-button wide"
-              key={demoUser.id}
-              onClick={() => onDemoLogin(demoUser)}
-              type="button"
-            >
-              데모: {demoUser.name}
-            </button>
-          ))}
         </div>
         <p className="login-footnote">
           Google/Kakao 로그인은 Supabase 설정 후 활성화됩니다.
