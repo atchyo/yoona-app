@@ -1,0 +1,23 @@
+{
+  "name": "Opti-Me",
+  "short_name": "Opti-Me",
+  "description": "가족의 약과 영양제 복용 기록을 함께 관리합니다.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b111c",
+  "theme_color": "#1677ff",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

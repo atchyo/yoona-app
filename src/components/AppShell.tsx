@@ -23,7 +23,7 @@ const navItems: Array<{ path: Route; label: string; ownerOnly?: boolean; adminOn
   { path: "/service-admin", label: "서비스", adminOnly: true },
 ];
 
-const appIconSrc = `${import.meta.env.BASE_URL}opti_me_top_left_icon.png`;
+const appIconSrc = `${import.meta.env.BASE_URL}opti_me_app_icon.png`;
 
 interface AppShellProps {
   availableProfiles: CareProfile[];
