@@ -77,9 +77,6 @@ export function LoginPage({
             Google 로그인
           </button>
         </div>
-        <p className="login-footnote">
-          Google/Kakao 로그인은 Supabase 설정 후 활성화됩니다.
-        </p>
       </section>
     </main>
   );
