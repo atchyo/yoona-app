@@ -13,7 +13,7 @@ interface ProfilesPageProps {
   currentProfileId: string;
   familyMembers: FamilyMember[];
   medications: Medication[];
-  onDeleteMedication: (medicationId: string) => void;
+  onDeleteMedication: (medicationId: string) => Promise<void> | void;
   schedules: MedicationSchedule[];
   temporaryMedications: TemporaryMedication[];
 }
@@ -56,7 +56,7 @@ function ProfileCard({
 }: {
   familyMembers: FamilyMember[];
   medications: Medication[];
-  onDeleteMedication: (medicationId: string) => void;
+  onDeleteMedication: (medicationId: string) => Promise<void> | void;
   profile: CareProfile;
   schedules: MedicationSchedule[];
   selected: boolean;
@@ -127,7 +127,7 @@ function CareReport({
   schedules,
 }: {
   medications: Medication[];
-  onDeleteMedication: (medicationId: string) => void;
+  onDeleteMedication: (medicationId: string) => Promise<void> | void;
   onClose: () => void;
   profile: CareProfile;
   profileLabel: string;
@@ -181,7 +181,7 @@ function CareReport({
                   <dd>{scheduleText(medication, schedules)}</dd>
                 </div>
               </dl>
-              <button className="danger-button report-delete-button" onClick={() => onDeleteMedication(medication.id)} type="button">
+              <button className="danger-button report-delete-button" onClick={() => void onDeleteMedication(medication.id)} type="button">
                 약 삭제
               </button>
             </article>

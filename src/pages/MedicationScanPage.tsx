@@ -14,8 +14,8 @@ import type {
 interface MedicationScanPageProps {
   careProfiles: CareProfile[];
   currentProfile: CareProfile;
-  onConfirmMedication: (medication: Medication, scan: OcrScan) => void;
-  onCreateTemporaryMedication: (medication: TemporaryMedication, scan: OcrScan) => void;
+  onConfirmMedication: (medication: Medication, scan: OcrScan) => Promise<void> | void;
+  onCreateTemporaryMedication: (medication: TemporaryMedication, scan: OcrScan) => Promise<void> | void;
 }
 
 export function MedicationScanPage({
@@ -219,58 +219,68 @@ export function MedicationScanPage({
     };
   }
 
-  function confirmMatch(match: DrugDatabaseMatch): void {
+  async function confirmMatch(match: DrugDatabaseMatch): Promise<void> {
     if (savingLockRef.current || isSaving) return;
 
     savingLockRef.current = true;
     setIsSaving(true);
     setProgress(`${match.productName} 저장 중`);
-    const scan = buildScan("confirmed", matches);
-    onConfirmMedication(
-      {
-        id: crypto.randomUUID(),
-        careProfileId: selectedProfile.id,
-        status: "confirmed",
-        productName: match.productName,
-        source: match.source,
-        ingredients: match.ingredients,
-        dosage: match.dosageForm,
-        instructions: match.usage,
-        warnings: match.warnings,
-        interactions: match.interactions,
-        startedAt: new Date().toISOString().slice(0, 10),
-      },
-      scan,
-    );
-    resetSearchArtifacts();
-    setProgress(`${match.productName} 등록 완료`);
-    setIsSaving(false);
-    savingLockRef.current = false;
+    try {
+      const scan = buildScan("confirmed", matches);
+      await onConfirmMedication(
+        {
+          id: crypto.randomUUID(),
+          careProfileId: selectedProfile.id,
+          status: "confirmed",
+          productName: match.productName,
+          source: match.source,
+          ingredients: match.ingredients,
+          dosage: match.dosageForm,
+          instructions: match.usage,
+          warnings: match.warnings,
+          interactions: match.interactions,
+          startedAt: new Date().toISOString().slice(0, 10),
+        },
+        scan,
+      );
+      resetSearchArtifacts();
+      setProgress(`${match.productName} 등록 완료`);
+    } catch (error) {
+      setProgress(error instanceof Error ? error.message : "약 저장 중 문제가 발생했습니다.");
+    } finally {
+      setIsSaving(false);
+      savingLockRef.current = false;
+    }
   }
 
-  function saveTemporary(): void {
+  async function saveTemporary(): Promise<void> {
     if (savingLockRef.current || isSaving) return;
 
     savingLockRef.current = true;
     setIsSaving(true);
     const rawName = manualName || candidates[0] || "이름 미확인 약";
     setProgress(`${rawName} 임시약 저장 중`);
-    const scan = buildScan("manual_needed", matches);
-    onCreateTemporaryMedication(
-      {
-        id: crypto.randomUUID(),
-        careProfileId: selectedProfile.id,
-        rawName,
-        rawText: ocrText,
-        note: manualIngredient ? `수기 성분: ${manualIngredient}` : "사용자 보완 필요",
-        createdAt: new Date().toISOString(),
-      },
-      scan,
-    );
-    resetSearchArtifacts();
-    setProgress(`${rawName} 임시약으로 저장 완료`);
-    setIsSaving(false);
-    savingLockRef.current = false;
+    try {
+      const scan = buildScan("manual_needed", matches);
+      await onCreateTemporaryMedication(
+        {
+          id: crypto.randomUUID(),
+          careProfileId: selectedProfile.id,
+          rawName,
+          rawText: ocrText,
+          note: manualIngredient ? `수기 성분: ${manualIngredient}` : "사용자 보완 필요",
+          createdAt: new Date().toISOString(),
+        },
+        scan,
+      );
+      resetSearchArtifacts();
+      setProgress(`${rawName} 임시약으로 저장 완료`);
+    } catch (error) {
+      setProgress(error instanceof Error ? error.message : "임시약 저장 중 문제가 발생했습니다.");
+    } finally {
+      setIsSaving(false);
+      savingLockRef.current = false;
+    }
   }
 
   return (

@@ -231,36 +231,47 @@ as $$
   );
 $$;
 
+drop policy if exists "Users can read own profile" on public.profiles;
 create policy "Users can read own profile" on public.profiles
 for select using (id = auth.uid());
 
+drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile" on public.profiles
 for update using (id = auth.uid()) with check (id = auth.uid());
 
+drop policy if exists "Members can read workspace" on public.family_workspaces;
 create policy "Members can read workspace" on public.family_workspaces
 for select using (public.is_family_member(id));
 
+drop policy if exists "Owners can update workspace" on public.family_workspaces;
 create policy "Owners can update workspace" on public.family_workspaces
 for update using (owner_user_id = auth.uid()) with check (owner_user_id = auth.uid());
 
+drop policy if exists "Members can read family members" on public.family_members;
 create policy "Members can read family members" on public.family_members
 for select using (public.is_family_member(workspace_id));
 
+drop policy if exists "Managers can manage family members" on public.family_members;
 create policy "Managers can manage family members" on public.family_members
 for all using (public.is_family_manager(workspace_id)) with check (public.is_family_manager(workspace_id));
 
+drop policy if exists "Members can read care profiles" on public.care_profiles;
 create policy "Members can read care profiles" on public.care_profiles
 for select using (public.is_family_member(workspace_id));
 
+drop policy if exists "Managers can manage care profiles" on public.care_profiles;
 create policy "Managers can manage care profiles" on public.care_profiles
 for all using (public.is_family_manager(workspace_id)) with check (public.is_family_manager(workspace_id));
 
+drop policy if exists "Members can read scans" on public.ocr_scans;
 create policy "Members can read scans" on public.ocr_scans
 for select using (public.is_family_member(workspace_id));
 
+drop policy if exists "Members can create scans" on public.ocr_scans;
 create policy "Members can create scans" on public.ocr_scans
 for insert with check (public.is_family_member(workspace_id) and created_by = auth.uid());
 
+drop policy if exists "Members can read medication photos" on public.medication_photos;
 create policy "Members can read medication photos" on public.medication_photos
 for select using (
   exists (
@@ -270,6 +281,7 @@ for select using (
   )
 );
 
+drop policy if exists "Members can manage medication photos" on public.medication_photos;
 create policy "Members can manage medication photos" on public.medication_photos
 for all using (
   exists (
@@ -285,6 +297,7 @@ for all using (
   )
 );
 
+drop policy if exists "Members can read drug matches" on public.drug_database_matches;
 create policy "Members can read drug matches" on public.drug_database_matches
 for select using (
   exists (
@@ -294,6 +307,7 @@ for select using (
   )
 );
 
+drop policy if exists "Members can manage drug matches" on public.drug_database_matches;
 create policy "Members can manage drug matches" on public.drug_database_matches
 for all using (
   exists (
@@ -309,18 +323,23 @@ for all using (
   )
 );
 
+drop policy if exists "Members can read medications" on public.medications;
 create policy "Members can read medications" on public.medications
 for select using (public.is_family_member(workspace_id));
 
+drop policy if exists "Members can manage medications" on public.medications;
 create policy "Members can manage medications" on public.medications
 for all using (public.is_family_member(workspace_id)) with check (public.is_family_member(workspace_id) and created_by = auth.uid());
 
+drop policy if exists "Members can read temporary medications" on public.temporary_medications;
 create policy "Members can read temporary medications" on public.temporary_medications
 for select using (public.is_family_member(workspace_id));
 
+drop policy if exists "Members can manage temporary medications" on public.temporary_medications;
 create policy "Members can manage temporary medications" on public.temporary_medications
 for all using (public.is_family_member(workspace_id)) with check (public.is_family_member(workspace_id) and created_by = auth.uid());
 
+drop policy if exists "Members can read schedules" on public.medication_schedules;
 create policy "Members can read schedules" on public.medication_schedules
 for select using (
   exists (
@@ -330,6 +349,7 @@ for select using (
   )
 );
 
+drop policy if exists "Members can manage schedules" on public.medication_schedules;
 create policy "Members can manage schedules" on public.medication_schedules
 for all using (
   exists (
@@ -345,6 +365,7 @@ for all using (
   )
 );
 
+drop policy if exists "Members can read medication logs" on public.medication_logs;
 create policy "Members can read medication logs" on public.medication_logs
 for select using (
   exists (
@@ -354,6 +375,7 @@ for select using (
   )
 );
 
+drop policy if exists "Members can create medication logs" on public.medication_logs;
 create policy "Members can create medication logs" on public.medication_logs
 for insert with check (
   created_by = auth.uid()
@@ -364,8 +386,10 @@ for insert with check (
   )
 );
 
+drop policy if exists "Members can read chat logs" on public.rule_based_chat_logs;
 create policy "Members can read chat logs" on public.rule_based_chat_logs
 for select using (public.is_family_member(workspace_id));
 
+drop policy if exists "Members can create chat logs" on public.rule_based_chat_logs;
 create policy "Members can create chat logs" on public.rule_based_chat_logs
 for insert with check (public.is_family_member(workspace_id) and created_by = auth.uid());

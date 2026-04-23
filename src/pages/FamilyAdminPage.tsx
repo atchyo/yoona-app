@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import type { ReactElement } from "react";
-import { workspace } from "../data/demoData";
 import type {
   CareProfile,
   DemoUser,
   FamilyMember,
   FamilyRole,
+  FamilyWorkspace,
   Medication,
   OcrScan,
   TemporaryMedication,
@@ -15,13 +15,14 @@ interface FamilyAdminPageProps {
   careProfiles: CareProfile[];
   familyMembers: FamilyMember[];
   medications: Medication[];
-  onAddCareProfile: (profile: CareProfile) => void;
-  onDeleteCareProfile: (profileId: string) => void;
-  onUpdateCareProfile: (profileId: string, patch: Partial<CareProfile>) => void;
-  onUpdateMember: (memberId: string, patch: Partial<FamilyMember>) => void;
+  onAddCareProfile: (profile: CareProfile) => Promise<void> | void;
+  onDeleteCareProfile: (profileId: string) => Promise<void> | void;
+  onUpdateCareProfile: (profileId: string, patch: Partial<CareProfile>) => Promise<void> | void;
+  onUpdateMember: (memberId: string, patch: Partial<FamilyMember>) => Promise<void> | void;
   scans: OcrScan[];
   temporaryMedications: TemporaryMedication[];
   user: DemoUser;
+  workspace: FamilyWorkspace;
 }
 
 export function FamilyAdminPage({
@@ -35,6 +36,7 @@ export function FamilyAdminPage({
   scans,
   temporaryMedications,
   user,
+  workspace,
 }: FamilyAdminPageProps): ReactElement {
   const [draftMembers, setDraftMembers] = useState<FamilyMember[]>(familyMembers);
   const [savedMemberId, setSavedMemberId] = useState("");
@@ -70,14 +72,18 @@ export function FamilyAdminPage({
     );
   }
 
-  function saveMember(member: FamilyMember): void {
-    onUpdateMember(member.id, {
-      displayName: member.displayName,
-      email: member.email,
-      role: member.role,
-      accessibleProfileIds: normalizedAccessibleProfileIds(member, careProfiles),
-    });
-    setSavedMemberId(member.id);
+  async function saveMember(member: FamilyMember): Promise<void> {
+    try {
+      await onUpdateMember(member.id, {
+        displayName: member.displayName,
+        email: member.email,
+        role: member.role,
+        accessibleProfileIds: normalizedAccessibleProfileIds(member, careProfiles),
+      });
+      setSavedMemberId(member.id);
+    } catch (error) {
+      setPetSaveNote(error instanceof Error ? error.message : "가족 구성원 저장 중 문제가 발생했습니다.");
+    }
   }
 
   function toggleProfileAccess(member: FamilyMember, profileId: string): void {
@@ -96,7 +102,7 @@ export function FamilyAdminPage({
     setPetForm((current) => ({ ...current, [field]: value }));
   }
 
-  function addPetProfile(): void {
+  async function addPetProfile(): Promise<void> {
     const name = petForm.name.trim();
     if (!name) {
       setPetSaveNote("이름을 입력해 주세요.");
@@ -118,33 +124,37 @@ export function FamilyAdminPage({
       return;
     }
 
-    onAddCareProfile({
-      id: `profile-pet-${crypto.randomUUID()}`,
-      workspaceId: workspace.id,
-      name,
-      type: "pet",
-      ageGroup: "20",
-      notes: notes || "반려동물 영양제와 약은 수의사 확인이 필요합니다.",
-      petDetails: {
-        birthDate: petForm.birthDate || undefined,
-        age: petForm.age || undefined,
-        weightKg: petForm.weightKg || undefined,
-        allergies: petForm.allergies || undefined,
-        mainFood: petForm.mainFood || undefined,
-        forbiddenFoods: petForm.forbiddenFoods || undefined,
-      },
-    });
-    setPetForm({
-      name: "",
-      birthDate: "",
-      age: "",
-      weightKg: "",
-      allergies: "",
-      mainFood: "",
-      forbiddenFoods: "",
-    });
-    setPetSaveNote(`${name} 등록 완료`);
-    setIsPetFormOpen(false);
+    try {
+      await onAddCareProfile({
+        id: `profile-pet-${crypto.randomUUID()}`,
+        workspaceId: workspace.id,
+        name,
+        type: "pet",
+        ageGroup: "20",
+        notes: notes || "반려동물 영양제와 약은 수의사 확인이 필요합니다.",
+        petDetails: {
+          birthDate: petForm.birthDate || undefined,
+          age: petForm.age || undefined,
+          weightKg: petForm.weightKg || undefined,
+          allergies: petForm.allergies || undefined,
+          mainFood: petForm.mainFood || undefined,
+          forbiddenFoods: petForm.forbiddenFoods || undefined,
+        },
+      });
+      setPetForm({
+        name: "",
+        birthDate: "",
+        age: "",
+        weightKg: "",
+        allergies: "",
+        mainFood: "",
+        forbiddenFoods: "",
+      });
+      setPetSaveNote(`${name} 등록 완료`);
+      setIsPetFormOpen(false);
+    } catch (error) {
+      setPetSaveNote(error instanceof Error ? error.message : "반려동물 등록 중 문제가 발생했습니다.");
+    }
   }
 
   function updatePetDraft(profileId: string, patch: Partial<CareProfile>): void {
@@ -168,7 +178,7 @@ export function FamilyAdminPage({
     });
   }
 
-  function savePetProfile(profile: CareProfile): void {
+  async function savePetProfile(profile: CareProfile): Promise<void> {
     const name = profile.name.trim();
     if (!name) {
       setPetSaveNote("반려동물 이름을 입력해 주세요.");
@@ -191,23 +201,31 @@ export function FamilyAdminPage({
       .filter(Boolean)
       .join(" · ");
 
-    onUpdateCareProfile(profile.id, {
-      ...profile,
-      name,
-      notes: notes || "반려동물 영양제와 약은 수의사 확인이 필요합니다.",
-    });
-    setSavedPetId(profile.id);
-    setEditingPetId("");
+    try {
+      await onUpdateCareProfile(profile.id, {
+        ...profile,
+        name,
+        notes: notes || "반려동물 영양제와 약은 수의사 확인이 필요합니다.",
+      });
+      setSavedPetId(profile.id);
+      setEditingPetId("");
+    } catch (error) {
+      setPetSaveNote(error instanceof Error ? error.message : "반려동물 정보를 저장하지 못했습니다.");
+    }
   }
 
-  function deletePetProfile(profile: CareProfile): void {
+  async function deletePetProfile(profile: CareProfile): Promise<void> {
     const shouldDelete = window.confirm(
       `${profile.name} 프로필을 삭제할까요? 등록된 약, 임시약, OCR 기록도 함께 정리됩니다.`,
     );
     if (!shouldDelete) return;
-    onDeleteCareProfile(profile.id);
-    if (editingPetId === profile.id) setEditingPetId("");
-    setPetSaveNote(`${profile.name} 삭제 완료`);
+    try {
+      await onDeleteCareProfile(profile.id);
+      if (editingPetId === profile.id) setEditingPetId("");
+      setPetSaveNote(`${profile.name} 삭제 완료`);
+    } catch (error) {
+      setPetSaveNote(error instanceof Error ? error.message : "반려동물 삭제 중 문제가 발생했습니다.");
+    }
   }
 
   function hasDuplicatePetName(name: string, excludeProfileId?: string): boolean {
@@ -242,9 +260,6 @@ export function FamilyAdminPage({
           <p className="eyebrow">Members</p>
           <h2>가족 구성원 관리</h2>
         </div>
-        <p className="muted">
-          지금은 데모/localStorage 저장입니다. Supabase 연결 후에는 같은 화면이 가족 구성원 테이블을 업데이트합니다.
-        </p>
         <div className="member-edit-list">
           {draftMembers.map((member) => (
             <article className="member-edit-card" key={member.id}>

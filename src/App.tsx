@@ -7,6 +7,7 @@ import {
   familyMembers as seedFamilyMembers,
   medicationSchedules,
   medications as seedMedications,
+  workspace as seedWorkspace,
 } from "./data/demoData";
 import { DashboardPage } from "./pages/DashboardPage";
 import { FamilyAdminPage } from "./pages/FamilyAdminPage";
@@ -17,6 +18,16 @@ import { RemindersPage } from "./pages/RemindersPage";
 import { RuleChatPage } from "./pages/RuleChatPage";
 import { ServiceAdminPage } from "./pages/ServiceAdminPage";
 import { appConfig } from "./config";
+import {
+  createRemoteCareProfile,
+  deleteRemoteCareProfile,
+  deleteRemoteMedication,
+  loadRemoteAppData,
+  saveConfirmedMedication,
+  saveTemporaryMedication,
+  updateRemoteCareProfile,
+  updateRemoteFamilyMember,
+} from "./services/supabaseData";
 import { signOutSupabase, supabase } from "./services/supabaseClient";
 import {
   clearUser,
@@ -41,6 +52,7 @@ import type {
   CareProfile,
   DemoUser,
   FamilyMember,
+  FamilyWorkspace,
   Medication,
   MedicationLog,
   OcrScan,
@@ -54,7 +66,9 @@ export function App(): ReactElement {
   const [theme, setTheme] = useState<ThemeMode>(() => loadTheme());
   const [user, setUser] = useState<DemoUser | null>(() => loadUser());
   const [authResolved, setAuthResolved] = useState<boolean>(() => !supabase);
+  const [dataResolved, setDataResolved] = useState<boolean>(() => !supabase);
   const [route, setRoute] = useState<Route>(() => getInitialRoute());
+  const [familyWorkspace, setFamilyWorkspace] = useState<FamilyWorkspace>(seedWorkspace);
   const [careProfileList, setCareProfileList] = useState<CareProfile[]>(() =>
     migrateDemoCareProfiles(loadCareProfiles(seedCareProfiles)),
   );
@@ -104,23 +118,23 @@ export function App(): ReactElement {
   }, [theme]);
 
   useEffect(() => {
-    saveMedications(medications);
+    if (!supabase) saveMedications(medications);
   }, [medications]);
 
   useEffect(() => {
-    saveCareProfiles(careProfileList);
+    if (!supabase) saveCareProfiles(careProfileList);
   }, [careProfileList]);
 
   useEffect(() => {
-    saveTemporaryMedications(temporaryMedications);
+    if (!supabase) saveTemporaryMedications(temporaryMedications);
   }, [temporaryMedications]);
 
   useEffect(() => {
-    saveScans(scans);
+    if (!supabase) saveScans(scans);
   }, [scans]);
 
   useEffect(() => {
-    saveFamilyMembers(familyMembers);
+    if (!supabase) saveFamilyMembers(familyMembers);
   }, [familyMembers]);
 
   useEffect(() => {
@@ -165,6 +179,8 @@ export function App(): ReactElement {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         applyAuthenticatedUser(mapSupabaseUser(session.user));
+      } else {
+        setDataResolved(true);
       }
       setAuthResolved(true);
     });
@@ -195,6 +211,66 @@ export function App(): ReactElement {
       replaceRoute("/");
     }
   }, [authResolved, route, user]);
+
+  useEffect(() => {
+    if (!authResolved) return;
+
+    if (!supabase) {
+      setDataResolved(true);
+      return;
+    }
+
+    if (!user) {
+      setDataResolved(true);
+      return;
+    }
+
+    const authenticatedUser = user;
+    let isCancelled = false;
+
+    async function syncRemoteWorkspace(): Promise<void> {
+      setDataResolved(false);
+
+      try {
+        const remoteData = await loadRemoteAppData(authenticatedUser);
+        if (isCancelled) return;
+
+        setFamilyWorkspace(remoteData.workspace);
+        setFamilyMembers(remoteData.familyMembers);
+        setCareProfileList(remoteData.careProfiles);
+        setMedications(remoteData.medications);
+        setTemporaryMedications(remoteData.temporaryMedications);
+        setScans(remoteData.scans);
+        setUser(remoteData.resolvedUser);
+
+        const persistedProfileId = loadCurrentProfileId("");
+        const availableProfiles = profilesAvailableForViewing(
+          remoteData.careProfiles,
+          remoteData.resolvedUser,
+          remoteData.familyMembers,
+        );
+        const nextProfileId = availableProfiles.some((profile) => profile.id === persistedProfileId)
+          ? persistedProfileId
+          : defaultProfileIdForUser(availableProfiles, remoteData.resolvedUser, "");
+        if (nextProfileId) {
+          saveCurrentProfileId(nextProfileId);
+          setCurrentProfileId(nextProfileId);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (!isCancelled) {
+          setDataResolved(true);
+        }
+      }
+    }
+
+    void syncRemoteWorkspace();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [authResolved, user?.id]);
 
   useEffect(() => {
     if (!user || !accessibleCareProfiles.length) return;
@@ -250,7 +326,15 @@ export function App(): ReactElement {
     setCurrentProfileId(nextProfileId);
   }
 
-  function handleConfirmMedication(medication: Medication, scan: OcrScan): void {
+  async function handleConfirmMedication(medication: Medication, scan: OcrScan): Promise<void> {
+    if (supabase) {
+      const saved = await saveConfirmedMedication(medication, scan);
+      setMedications((current) => [saved.medication, ...current.filter((item) => item.id !== saved.medication.id)]);
+      setScans((current) => [saved.scan, ...current.filter((item) => item.id !== saved.scan.id)]);
+      handleProfileChange(saved.medication.careProfileId);
+      return;
+    }
+
     setMedications((current) => {
       const existingIndex = current.findIndex(
         (item) =>
@@ -271,10 +355,21 @@ export function App(): ReactElement {
     handleProfileChange(medication.careProfileId);
   }
 
-  function handleCreateTemporaryMedication(
+  async function handleCreateTemporaryMedication(
     medication: TemporaryMedication,
     scan: OcrScan,
-  ): void {
+  ): Promise<void> {
+    if (supabase) {
+      const saved = await saveTemporaryMedication(medication, scan);
+      setTemporaryMedications((current) => [
+        saved.medication,
+        ...current.filter((item) => item.id !== saved.medication.id),
+      ]);
+      setScans((current) => [saved.scan, ...current.filter((item) => item.id !== saved.scan.id)]);
+      handleProfileChange(saved.medication.careProfileId);
+      return;
+    }
+
     setTemporaryMedications((current) => {
       const existingIndex = current.findIndex(
         (item) =>
@@ -294,7 +389,11 @@ export function App(): ReactElement {
     handleProfileChange(medication.careProfileId);
   }
 
-  function handleDeleteMedication(medicationId: string): void {
+  async function handleDeleteMedication(medicationId: string): Promise<void> {
+    if (supabase) {
+      await deleteRemoteMedication(medicationId);
+    }
+
     setMedications((current) => current.filter((medication) => medication.id !== medicationId));
   }
 
@@ -313,26 +412,53 @@ export function App(): ReactElement {
     ]);
   }
 
-  function handleUpdateFamilyMember(memberId: string, patch: Partial<FamilyMember>): void {
+  async function handleUpdateFamilyMember(memberId: string, patch: Partial<FamilyMember>): Promise<void> {
+    if (supabase) {
+      const savedMember = await updateRemoteFamilyMember(memberId, patch);
+      setFamilyMembers((current) =>
+        current.map((member) => (member.id === memberId ? savedMember : member)),
+      );
+      return;
+    }
+
     setFamilyMembers((current) =>
       current.map((member) => (member.id === memberId ? { ...member, ...patch } : member)),
     );
   }
 
-  function handleAddCareProfile(profile: CareProfile): void {
+  async function handleAddCareProfile(profile: CareProfile): Promise<void> {
+    if (supabase) {
+      const savedProfile = await createRemoteCareProfile(profile);
+      setCareProfileList((current) => [savedProfile, ...current]);
+      handleProfileChange(savedProfile.id);
+      return;
+    }
+
     setCareProfileList((current) => [profile, ...current]);
     handleProfileChange(profile.id);
   }
 
-  function handleUpdateCareProfile(profileId: string, patch: Partial<CareProfile>): void {
+  async function handleUpdateCareProfile(profileId: string, patch: Partial<CareProfile>): Promise<void> {
+    if (supabase) {
+      const savedProfile = await updateRemoteCareProfile(profileId, patch);
+      setCareProfileList((current) =>
+        current.map((profile) => (profile.id === profileId ? savedProfile : profile)),
+      );
+      return;
+    }
+
     setCareProfileList((current) =>
       current.map((profile) => (profile.id === profileId ? { ...profile, ...patch } : profile)),
     );
   }
 
-  function handleDeleteCareProfile(profileId: string): void {
+  async function handleDeleteCareProfile(profileId: string): Promise<void> {
     const targetProfile = careProfileList.find((profile) => profile.id === profileId);
     if (!targetProfile || targetProfile.type !== "pet") return;
+
+    if (supabase) {
+      await deleteRemoteCareProfile(profileId);
+    }
 
     setCareProfileList((current) => current.filter((profile) => profile.id !== profileId));
     setMedications((current) => current.filter((medication) => medication.careProfileId !== profileId));
@@ -356,6 +482,19 @@ export function App(): ReactElement {
           <span />
         </div>
         <p className="sr-only">로그인 세션을 확인하고 있습니다.</p>
+      </main>
+    );
+  }
+
+  if (user && !dataResolved) {
+    return (
+      <main className="auth-boot" aria-live="polite" aria-busy="true">
+        <div className="auth-boot-indicator" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
+        <p className="sr-only">가족 약 데이터를 동기화하고 있습니다.</p>
       </main>
     );
   }
@@ -433,6 +572,7 @@ export function App(): ReactElement {
           scans={scans}
           temporaryMedications={temporaryMedications}
           user={user}
+          workspace={familyWorkspace}
         />
       )}
       {route === "/service-admin" && user.role === "admin" && <ServiceAdminPage />}
