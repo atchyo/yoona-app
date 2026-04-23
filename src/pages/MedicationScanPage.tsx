@@ -472,6 +472,7 @@ function dedupeMatches(matches: DrugDatabaseMatch[]): DrugDatabaseMatch[] {
 function sourceLabel(source: DrugDatabaseMatch["source"]): string {
   if (source === "mfds_permit") return "식약처 허가정보";
   if (source === "mfds_easy") return "e약은요";
+  if (source === "mfds_health") return "건강기능식품정보";
   if (source === "rxnorm") return "RxNorm";
   if (source === "dailymed") return "DailyMed";
   if (source === "openfda") return "openFDA";

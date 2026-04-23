@@ -5,6 +5,7 @@ export type FamilyRole = "owner" | "manager" | "member";
 export type DrugSource =
   | "mfds_permit"
   | "mfds_easy"
+  | "mfds_health"
   | "rxnorm"
   | "dailymed"
   | "openfda"

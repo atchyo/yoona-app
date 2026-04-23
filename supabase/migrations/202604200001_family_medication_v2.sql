@@ -48,7 +48,7 @@ exception when duplicate_object then null;
 end $$;
 
 do $$ begin
-  create type public.drug_source as enum ('mfds_permit', 'mfds_easy', 'rxnorm', 'dailymed', 'openfda', 'manual');
+  create type public.drug_source as enum ('mfds_permit', 'mfds_easy', 'mfds_health', 'rxnorm', 'dailymed', 'openfda', 'manual');
 exception when duplicate_object then null;
 end $$;
 
