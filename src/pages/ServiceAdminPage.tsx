@@ -13,7 +13,7 @@ export function ServiceAdminPage(): ReactElement {
           </p>
         </div>
         <div className="stat-grid">
-          <div className="stat-card"><span>데모 후보</span><strong>{drugMatches.length}</strong></div>
+          <div className="stat-card"><span>기본 후보</span><strong>{drugMatches.length}</strong></div>
           <div className="stat-card"><span>규칙</span><strong>{interactionRules.length}</strong></div>
           <div className="stat-card"><span>AI 비용</span><strong>0원</strong></div>
         </div>
