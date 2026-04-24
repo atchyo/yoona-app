@@ -16,15 +16,16 @@ export async function searchDrugDatabase(query: string): Promise<DrugDatabaseMat
   if (!trimmed) return [];
 
   if (supabase) {
-    try {
-      const { data, error } = await supabase.functions.invoke("drug-search", {
-        body: { query: trimmed },
-      });
-      if (!error && Array.isArray(data?.matches) && data.matches.length > 0) {
-        return data.matches as DrugDatabaseMatch[];
-      }
-    } catch {
-      return [];
+    const { data, error } = await supabase.functions.invoke("drug-search", {
+      body: { query: trimmed },
+    });
+
+    if (error) {
+      throw new Error(error.message || "약DB 검색 요청에 실패했습니다.");
+    }
+
+    if (Array.isArray(data?.matches)) {
+      return data.matches as DrugDatabaseMatch[];
     }
   }
 

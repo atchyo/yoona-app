@@ -18,7 +18,6 @@ import { RemindersPage } from "./pages/RemindersPage";
 import { RuleChatPage } from "./pages/RuleChatPage";
 import { ServiceAdminPage } from "./pages/ServiceAdminPage";
 import { appConfig } from "./config";
-import { syncDrugCatalog as syncRemoteDrugCatalog } from "./services/drugSearch";
 import {
   acceptRemoteFamilyInvitation,
   createRemoteCareProfile,
@@ -439,14 +438,6 @@ export function App(): ReactElement {
     setMedications((current) => current.filter((medication) => medication.id !== medicationId));
   }
 
-  async function handleSyncDrugCatalog(): Promise<{
-    source: string;
-    fetchedCount: number;
-    upsertedCount: number;
-  }[]> {
-    return syncRemoteDrugCatalog();
-  }
-
   function handleMarkTaken(scheduleId: string): void {
     const schedule = medicationSchedules.find((item) => item.id === scheduleId);
     if (!schedule) return;
@@ -708,6 +699,8 @@ export function App(): ReactElement {
         <MedicationScanPage
           careProfiles={registrationCareProfiles}
           currentProfile={displayCurrentProfile}
+          medications={medications}
+          onDeleteMedication={handleDeleteMedication}
           onConfirmMedication={handleConfirmMedication}
           onCreateTemporaryMedication={handleCreateTemporaryMedication}
         />
@@ -751,7 +744,6 @@ export function App(): ReactElement {
           temporaryMedications={temporaryMedications}
           user={user}
           workspace={familyWorkspace}
-          onSyncDrugCatalog={handleSyncDrugCatalog}
         />
       )}
       {route === "/service-admin" && user.role === "admin" && <ServiceAdminPage />}

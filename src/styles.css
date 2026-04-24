@@ -947,6 +947,38 @@ textarea {
   gap: 12px;
 }
 
+.medication-manager-card {
+  overflow: hidden;
+}
+
+.medication-table-list {
+  display: grid;
+  gap: 8px;
+}
+
+.medication-table-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) 160px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 70px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  padding: 12px;
+}
+
+.medication-table-row strong,
+.medication-table-row span {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.medication-table-row span {
+  color: var(--color-muted);
+}
+
 .match-card {
   display: grid;
   min-width: 0;
@@ -2021,6 +2053,7 @@ td select {
   .capture-actions,
   .manual-search,
   .member-edit-fields,
+  .medication-table-row,
   .pet-form-grid {
     grid-template-columns: 1fr;
   }

@@ -14,6 +14,8 @@ import type {
 interface MedicationScanPageProps {
   careProfiles: CareProfile[];
   currentProfile: CareProfile;
+  medications: Medication[];
+  onDeleteMedication: (medicationId: string) => Promise<void> | void;
   onConfirmMedication: (medication: Medication, scan: OcrScan) => Promise<void> | void;
   onCreateTemporaryMedication: (medication: TemporaryMedication, scan: OcrScan) => Promise<void> | void;
 }
@@ -21,6 +23,8 @@ interface MedicationScanPageProps {
 export function MedicationScanPage({
   careProfiles,
   currentProfile,
+  medications,
+  onDeleteMedication,
   onConfirmMedication,
   onCreateTemporaryMedication,
 }: MedicationScanPageProps): ReactElement {
@@ -40,6 +44,7 @@ export function MedicationScanPage({
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [cameraError, setCameraError] = useState("");
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [deletingMedicationId, setDeletingMedicationId] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,6 +81,10 @@ export function MedicationScanPage({
       setManualName("");
     }
   }
+
+  const selectedProfileMedications = medications.filter(
+    (medication) => medication.careProfileId === selectedProfile.id,
+  );
 
   async function handleFile(file: File): Promise<void> {
     try {
@@ -185,14 +194,23 @@ export function MedicationScanPage({
       return;
     }
 
-    resetSearchArtifacts({ preserveManualName: true });
-    setIsProcessing(true);
-    setProgress(`"${query}" 약 데이터베이스 검색 중`);
-    const nextMatches = await searchDrugDatabase(query);
-    setCandidates([query]);
-    setMatches(dedupeMatches(nextMatches));
-    setProgress(nextMatches.length ? "검색 후보를 확인해 주세요." : "공식 후보 없음. 임시약 저장 또는 수기 보완이 필요합니다.");
-    setIsProcessing(false);
+    try {
+      resetSearchArtifacts({ preserveManualName: true });
+      setIsProcessing(true);
+      setProgress(`"${query}" 약 데이터베이스 검색 중`);
+      const nextMatches = await searchDrugDatabase(query);
+      setCandidates([query]);
+      setMatches(dedupeMatches(nextMatches));
+      setProgress(
+        nextMatches.length
+          ? "검색 후보를 확인해 주세요."
+          : "공식 후보 없음. 임시약 저장 또는 수기 보완이 필요합니다.",
+      );
+    } catch (error) {
+      setProgress(error instanceof Error ? error.message : "약DB 검색 중 문제가 발생했습니다.");
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   function buildScan(status: OcrScan["status"], nextMatches: DrugDatabaseMatch[] = matches): OcrScan {
@@ -283,8 +301,59 @@ export function MedicationScanPage({
     }
   }
 
+  async function requestDeleteMedication(medication: Medication): Promise<void> {
+    const confirmed = window.confirm(`${selectedProfile.name}님의 ${medication.productName} 기록을 삭제할까요?`);
+    if (!confirmed) return;
+
+    setDeletingMedicationId(medication.id);
+    setProgress(`${medication.productName} 삭제 중`);
+    try {
+      await onDeleteMedication(medication.id);
+      setProgress(`${medication.productName} 삭제 완료`);
+    } catch (error) {
+      setProgress(error instanceof Error ? error.message : "약 삭제 중 문제가 발생했습니다.");
+    } finally {
+      setDeletingMedicationId("");
+    }
+  }
+
   return (
     <div className="scan-layout">
+      <section className="card full-span medication-manager-card">
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow">Medication Manager</p>
+            <h2>{selectedProfile.name}님의 등록 약</h2>
+            <p className="muted">현재 선택한 가족의 약·영양제 기록을 확인하고 필요 없는 항목은 바로 정리합니다.</p>
+          </div>
+          <span className="profile-active-badge">등록 {selectedProfileMedications.length}건</span>
+        </div>
+        {selectedProfileMedications.length ? (
+          <div className="medication-table-list">
+            {selectedProfileMedications.map((medication) => (
+              <article className="medication-table-row" key={medication.id}>
+                <div>
+                  <strong>{medication.productName}</strong>
+                  <span>{medication.ingredients.map(formatIngredient).join(", ") || "성분 미등록"}</span>
+                </div>
+                <span>{sourceLabel(medication.source)}</span>
+                <span>{medication.instructions || medication.dosage || "복용 정보 미등록"}</span>
+                <button
+                  className="danger-button table-action"
+                  disabled={deletingMedicationId === medication.id}
+                  onClick={() => void requestDeleteMedication(medication)}
+                  type="button"
+                >
+                  {deletingMedicationId === medication.id ? "삭제 중" : "삭제"}
+                </button>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="empty-panel">아직 등록된 약이 없습니다. 사진 촬영이나 약DB 검색으로 첫 기록을 추가해 주세요.</p>
+        )}
+      </section>
+
       <section className="card scan-card">
         <div className="section-heading">
           <p className="eyebrow">OCR Registration</p>
@@ -478,4 +547,8 @@ function sourceLabel(source: DrugDatabaseMatch["source"]): string {
   if (source === "dailymed") return "DailyMed";
   if (source === "openfda") return "openFDA";
   return "수기입력";
+}
+
+function formatIngredient(ingredient: Medication["ingredients"][number]): string {
+  return ingredient.amount ? `${ingredient.name} ${ingredient.amount}` : ingredient.name;
 }
