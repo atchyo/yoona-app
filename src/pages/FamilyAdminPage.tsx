@@ -190,7 +190,7 @@ export function FamilyAdminPage({
         role: memberForm.role === "owner" ? "member" : memberForm.role,
       });
       setMemberForm({ displayName: "", email: "", role: "member" });
-      setMemberSaveNote(`${displayName}님에게 가족공간 초대를 만들었습니다. 상대가 수락하면 연결됩니다.`);
+      setMemberSaveNote(`${displayName}님 관리대상과 가족공간 초대를 만들었습니다. 상대가 수락하면 계정이 연결됩니다.`);
       setIsMemberFormOpen(false);
     } catch (error) {
       setMemberSaveNote(error instanceof Error ? error.message : "가족 구성원 추가 중 문제가 발생했습니다.");
@@ -372,7 +372,7 @@ export function FamilyAdminPage({
             <p className="eyebrow">초대와 권한</p>
             <h2>가족 구성원 관리</h2>
             <p className="muted">
-              이메일로 가족공간 초대를 보내고, 상대가 직접 수락해야 같은 공간에 연결됩니다.
+              초대 즉시 관리대상이 만들어지고, 상대가 수락하면 같은 가족공간 계정으로 연결됩니다.
             </p>
           </div>
           <button
