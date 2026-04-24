@@ -7,6 +7,7 @@ const SOURCE_ORDER = ["mfds_health", "mfds_permit", "mfds_easy"];
 const DEFAULT_PAGE_SIZE = 100;
 const DEFAULT_PAGE_LIMIT = 10;
 const UPSERT_CHUNK_SIZE = 200;
+const DELETE_CHUNK_SIZE = 1000;
 
 const SOURCE_CONFIGS = {
   mfds_permit: {
@@ -189,9 +190,8 @@ async function syncSource(
     }
 
     if (resetSource && !dryRun) {
-      const { error } = await supabase.from("drug_catalog_items").delete().eq("source", source);
-      if (error) throw new Error(error.message);
-      console.log(`[${source}] removed existing catalog rows`);
+      const removedCount = await deleteSourceRows(supabase, source);
+      console.log(`[${source}] removed existing catalog rows: ${removedCount}`);
     }
 
     while (pagesRead < pageLimit) {
@@ -286,6 +286,28 @@ async function upsertRows(supabase, rows) {
       .from("drug_catalog_items")
       .upsert(chunk, { onConflict: "source,source_record_id" });
     if (error) throw new Error(error.message);
+  }
+}
+
+async function deleteSourceRows(supabase, source) {
+  let removedCount = 0;
+
+  while (true) {
+    const { data, error: selectError } = await supabase
+      .from("drug_catalog_items")
+      .select("id")
+      .eq("source", source)
+      .limit(DELETE_CHUNK_SIZE);
+
+    if (selectError) throw new Error(selectError.message);
+    const ids = (data || []).map((row) => row.id).filter(Boolean);
+    if (!ids.length) return removedCount;
+
+    const { error: deleteError } = await supabase.from("drug_catalog_items").delete().in("id", ids);
+    if (deleteError) throw new Error(deleteError.message);
+
+    removedCount += ids.length;
+    if (ids.length < DELETE_CHUNK_SIZE) return removedCount;
   }
 }
 

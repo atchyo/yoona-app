@@ -1,6 +1,27 @@
 import { supabase } from "./supabaseClient";
 import type { DrugDatabaseMatch } from "../types";
 
+interface CatalogSearchRow {
+  source: DrugDatabaseMatch["source"];
+  source_record_id: string;
+  category: "drug" | "supplement";
+  product_name: string;
+  manufacturer: string | null;
+  ingredients: DrugDatabaseMatch["ingredients"] | null;
+  dosage_form: string | null;
+  efficacy: string | null;
+  usage: string | null;
+  warnings: string[] | null;
+  interactions: string[] | null;
+  search_text: string | null;
+  search_compact: string | null;
+}
+
+const CATALOG_SELECT_COLUMNS =
+  "source, source_record_id, category, product_name, manufacturer, ingredients, dosage_form, efficacy, usage, warnings, interactions, search_text, search_compact";
+const DIRECT_RESULT_LIMIT = 20;
+const TOKEN_QUERY_LIMIT = 300;
+
 export interface DrugCatalogSyncSummary {
   source: string;
   fetchedCount: number;
@@ -16,20 +37,169 @@ export async function searchDrugDatabase(query: string): Promise<DrugDatabaseMat
   if (!trimmed) return [];
 
   if (supabase) {
+    const directMatches = await searchCatalogDirectly(trimmed).catch((error) => {
+      console.warn("Direct catalog search failed", error);
+      return [] as DrugDatabaseMatch[];
+    });
+
+    if (directMatches.length >= 8) {
+      return directMatches.slice(0, DIRECT_RESULT_LIMIT);
+    }
+
     const { data, error } = await supabase.functions.invoke("drug-search", {
       body: { query: trimmed },
     });
 
     if (error) {
-      throw new Error(error.message || "약DB 검색 요청에 실패했습니다.");
+      if (directMatches.length) return directMatches.slice(0, DIRECT_RESULT_LIMIT);
+      console.warn("Drug search function failed", error);
+      return [];
     }
 
     if (Array.isArray(data?.matches)) {
-      return data.matches as DrugDatabaseMatch[];
+      return dedupeMatches([...directMatches, ...(data.matches as DrugDatabaseMatch[])])
+        .sort((left, right) => compareMatches(trimmed, left, right))
+        .slice(0, DIRECT_RESULT_LIMIT);
     }
+
+    return directMatches.slice(0, DIRECT_RESULT_LIMIT);
   }
 
   return [];
+}
+
+async function searchCatalogDirectly(query: string): Promise<DrugDatabaseMatch[]> {
+  if (!supabase) return [];
+
+  const tokens = buildSearchTokens(query);
+  if (tokens.length > 1) {
+    const rowMap = new Map<string, CatalogSearchRow>();
+
+    for (const token of tokens) {
+      const { data, error } = await supabase
+        .from("drug_catalog_items")
+        .select(CATALOG_SELECT_COLUMNS)
+        .ilike("search_compact", `%${token}%`)
+        .limit(TOKEN_QUERY_LIMIT)
+        .returns<CatalogSearchRow[]>();
+
+      if (error) throw new Error(error.message);
+      (data || []).forEach((row) => rowMap.set(`${row.source}:${row.source_record_id}`, row));
+    }
+
+    const rows = Array.from(rowMap.values()).filter((row) => {
+      const compact = row.search_compact || "";
+      return tokens.every((token) => compact.includes(token));
+    });
+
+    if (rows.length) {
+      return rows
+        .map((row) => mapCatalogRow(query, row))
+        .sort((left, right) => compareMatches(query, left, right))
+        .slice(0, DIRECT_RESULT_LIMIT);
+    }
+  }
+
+  const compactQuery = normalizeName(query);
+  const filters = [
+    `search_text.ilike.%${query}%`,
+    compactQuery && `search_compact.ilike.%${compactQuery}%`,
+    ...tokens.map((token) => `search_compact.ilike.%${token}%`),
+  ].filter(Boolean);
+
+  if (!filters.length) return [];
+
+  const { data, error } = await supabase
+    .from("drug_catalog_items")
+    .select(CATALOG_SELECT_COLUMNS)
+    .or(filters.join(","))
+    .limit(TOKEN_QUERY_LIMIT)
+    .returns<CatalogSearchRow[]>();
+
+  if (error) throw new Error(error.message);
+
+  const rows =
+    tokens.length > 1
+      ? (data || []).filter((row) => tokens.every((token) => (row.search_compact || "").includes(token)))
+      : data || [];
+
+  return rows
+    .map((row) => mapCatalogRow(query, row))
+    .sort((left, right) => compareMatches(query, left, right))
+    .slice(0, DIRECT_RESULT_LIMIT);
+}
+
+function buildSearchTokens(query: string): string[] {
+  return Array.from(
+    new Set(
+      query
+        .split(/[\s,./()[\]\-_/]+/)
+        .map((token) => normalizeName(token))
+        .filter((token) => token.length >= 2),
+    ),
+  ).slice(0, 6);
+}
+
+function normalizeName(value: string): string {
+  return value.toLowerCase().replace(/[\s\-_/()[\].,]/g, "");
+}
+
+function mapCatalogRow(query: string, row: CatalogSearchRow): DrugDatabaseMatch {
+  const exactBonus =
+    normalizeName(row.product_name) === normalizeName(query)
+      ? 0.07
+      : normalizeName(row.product_name).startsWith(normalizeName(query))
+        ? 0.04
+        : 0;
+  const supplementBonus = looksLikeSupplementQuery(query) && row.category === "supplement" ? 0.03 : 0;
+
+  return {
+    id: `${row.source}-${row.source_record_id}`,
+    source: row.source,
+    productName: row.product_name,
+    manufacturer: row.manufacturer || undefined,
+    ingredients: Array.isArray(row.ingredients) ? row.ingredients : [],
+    dosageForm: row.dosage_form || undefined,
+    efficacy: row.efficacy || undefined,
+    usage: row.usage || undefined,
+    warnings: row.warnings || [],
+    interactions: row.interactions || [],
+    confidence: Math.min(0.98, baseConfidence(row.source) + exactBonus + supplementBonus),
+  };
+}
+
+function baseConfidence(source: DrugDatabaseMatch["source"]): number {
+  if (source === "mfds_permit") return 0.9;
+  if (source === "mfds_easy") return 0.78;
+  if (source === "mfds_health") return 0.84;
+  return 0.55;
+}
+
+function looksLikeSupplementQuery(query: string): boolean {
+  return /비타민|오메가|마그네슘|칼슘|아연|유산균|프로바이오틱|영양제|건강|루테인|콜라겐|밀크씨슬/i.test(query);
+}
+
+function dedupeMatches(matches: DrugDatabaseMatch[]): DrugDatabaseMatch[] {
+  return Array.from(new Map(matches.map((match) => [match.id, match])).values());
+}
+
+function compareMatches(query: string, left: DrugDatabaseMatch, right: DrugDatabaseMatch): number {
+  const normalizedQuery = normalizeName(query);
+  return scoreMatch(normalizedQuery, right) - scoreMatch(normalizedQuery, left);
+}
+
+function scoreMatch(normalizedQuery: string, match: DrugDatabaseMatch): number {
+  const product = normalizeName(match.productName);
+  const manufacturer = normalizeName(match.manufacturer || "");
+  let score = match.confidence;
+
+  if (product === normalizedQuery) score += 0.5;
+  else if (product.startsWith(normalizedQuery)) score += 0.3;
+  else if (product.includes(normalizedQuery)) score += 0.18;
+  if (manufacturer.includes(normalizedQuery)) score += 0.06;
+  if (match.source === "mfds_health") score += 0.02;
+
+  return score;
 }
 
 export async function syncDrugCatalog(): Promise<DrugCatalogSyncSummary[]> {

@@ -27,6 +27,7 @@ interface SyncOptions {
 
 const DEFAULT_PAGE_SIZE = 100;
 const DEFAULT_PAGE_COUNT = 15;
+const DELETE_CHUNK_SIZE = 1000;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -130,8 +131,7 @@ async function syncSource(
 
   try {
     if (options.reset && options.startPage === 1) {
-      const { error } = await adminClient.from("drug_catalog_items").delete().eq("source", options.source);
-      if (error) throw new Error(error.message);
+      await deleteSourceRows(adminClient, options.source);
     }
 
     const result = await fetchCatalogRows(options);
@@ -179,6 +179,31 @@ async function syncSource(
         .eq("id", runId);
     }
     throw error;
+  }
+}
+
+async function deleteSourceRows(
+  adminClient: ReturnType<typeof createClient>,
+  source: SyncSource,
+): Promise<number> {
+  let removedCount = 0;
+
+  while (true) {
+    const { data, error: selectError } = await adminClient
+      .from("drug_catalog_items")
+      .select("id")
+      .eq("source", source)
+      .limit(DELETE_CHUNK_SIZE);
+
+    if (selectError) throw new Error(selectError.message);
+    const ids = (data || []).map((row: { id: string }) => row.id).filter(Boolean);
+    if (!ids.length) return removedCount;
+
+    const { error: deleteError } = await adminClient.from("drug_catalog_items").delete().in("id", ids);
+    if (deleteError) throw new Error(deleteError.message);
+
+    removedCount += ids.length;
+    if (ids.length < DELETE_CHUNK_SIZE) return removedCount;
   }
 }
 
