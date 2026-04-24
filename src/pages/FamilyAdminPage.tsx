@@ -353,10 +353,10 @@ export function FamilyAdminPage({
     <div className="admin-layout">
       <section className="card">
         <div className="section-heading">
-          <p className="eyebrow">Family Workspace</p>
+          <p className="eyebrow">가족공간</p>
           <h2>{workspace.name}</h2>
           <p className="muted">
-            현재 역할: {user.familyRole}. 대표자는 가족 전체의 약 정보를 확인하고 이름, 이메일, 권한을 수정할 수 있습니다.
+            현재 역할: {roleLabel(user.familyRole)}. 대표자는 가족 전체의 약 정보를 확인하고 이름, 이메일, 권한을 수정할 수 있습니다.
           </p>
         </div>
         <div className="stat-grid">
@@ -369,7 +369,7 @@ export function FamilyAdminPage({
       <section className="card">
         <div className="section-heading split-heading">
           <div>
-            <p className="eyebrow">Members</p>
+            <p className="eyebrow">초대와 권한</p>
             <h2>가족 구성원 관리</h2>
             <p className="muted">
               이메일로 가족공간 초대를 보내고, 상대가 직접 수락해야 같은 공간에 연결됩니다.
@@ -380,7 +380,7 @@ export function FamilyAdminPage({
             onClick={() => setIsMemberFormOpen((current) => !current)}
             type="button"
           >
-            {isMemberFormOpen ? "추가 접기" : "가족 추가"}
+            {isMemberFormOpen ? "초대 접기" : "가족 초대"}
           </button>
         </div>
         {isMemberFormOpen && (
@@ -409,14 +409,14 @@ export function FamilyAdminPage({
                   onChange={(event) => updateMemberForm("role", event.target.value)}
                   value={memberForm.role}
                 >
-                  <option value="member">member</option>
-                  <option value="manager">manager</option>
+                  <option value="member">가족구성원</option>
+                  <option value="manager">가족관리자</option>
                 </select>
               </label>
             </div>
             <div className="form-action-row">
               <button className="primary-button" onClick={addFamilyMember} type="button">
-                구성원 추가
+                초대 만들기
               </button>
             </div>
           </div>
@@ -507,9 +507,9 @@ export function FamilyAdminPage({
                     }
                     value={member.role}
                   >
-                    <option value="owner">owner</option>
-                    <option value="manager">manager</option>
-                    <option value="member">member</option>
+                    <option value="owner">가족대표</option>
+                    <option value="manager">가족관리자</option>
+                    <option value="member">가족구성원</option>
                   </select>
                 </label>
               </div>

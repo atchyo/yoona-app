@@ -778,7 +778,7 @@ function InvitationInbox({
       {incomingInvitations.map((invitation) => (
         <article className="invitation-card" key={invitation.id}>
           <div>
-            <p className="eyebrow">Family Invite</p>
+            <p className="eyebrow">가족공간 초대</p>
             <strong>{invitation.workspaceName || "가족공간"} 초대가 도착했습니다.</strong>
             <p>
               수락하면 이 가족공간을 함께 볼 수 있습니다. 기존 개인 복용 기록은 자동으로 합쳐지지 않습니다.

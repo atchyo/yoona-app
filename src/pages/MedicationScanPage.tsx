@@ -322,7 +322,7 @@ export function MedicationScanPage({
       <section className="card full-span medication-manager-card">
         <div className="section-heading split-heading">
           <div>
-            <p className="eyebrow">Medication Manager</p>
+            <p className="eyebrow">등록 약 관리</p>
             <h2>{selectedProfile.name}님의 등록 약</h2>
             <p className="muted">현재 선택한 가족의 약·영양제 기록을 확인하고 필요 없는 항목은 바로 정리합니다.</p>
           </div>
@@ -356,7 +356,7 @@ export function MedicationScanPage({
 
       <section className="card scan-card">
         <div className="section-heading">
-          <p className="eyebrow">OCR Registration</p>
+          <p className="eyebrow">사진 OCR</p>
           <h2>약 사진 등록</h2>
           <p className="muted">사진에는 이름, 생년월일, 병원/약국 정보가 포함될 수 있습니다. 기본 저장되며 나중에 사진만 삭제할 수 있습니다.</p>
         </div>
@@ -431,7 +431,7 @@ export function MedicationScanPage({
 
       <section className="card">
         <div className="section-heading">
-          <p className="eyebrow">Detected Text</p>
+          <p className="eyebrow">인식 결과</p>
           <h2>OCR 결과와 후보</h2>
         </div>
         <textarea
@@ -453,7 +453,7 @@ export function MedicationScanPage({
 
       <section className="card full-span">
         <div className="section-heading">
-          <p className="eyebrow">Drug Database Matches</p>
+          <p className="eyebrow">공식 약DB</p>
           <h2>공식 DB 후보 확인</h2>
           <p className="muted">
             실제 공식 데이터베이스 검색 결과만 표시합니다. 관련도 높은 후보를 최대 20개까지 보여주고,
