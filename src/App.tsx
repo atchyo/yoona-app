@@ -21,6 +21,7 @@ import { appConfig } from "./config";
 import { syncDrugCatalog as syncRemoteDrugCatalog } from "./services/drugSearch";
 import {
   createRemoteCareProfile,
+  createRemoteFamilyMember,
   deleteRemoteCareProfile,
   deleteRemoteMedication,
   loadRemoteAppData,
@@ -29,6 +30,7 @@ import {
   updateRemoteCareProfile,
   updateRemoteFamilyMember,
 } from "./services/supabaseData";
+import type { RemoteAppData } from "./services/supabaseData";
 import { signOutSupabase, supabase } from "./services/supabaseClient";
 import {
   clearUser,
@@ -104,7 +106,7 @@ export function App(): ReactElement {
     [accessibleCareProfiles, familyMembers, user],
   );
   const registrationCareProfiles = useMemo(
-    () => profilesAvailableForMedicationRegistration(careProfileList, user).map((profile) =>
+    () => profilesAvailableForMedicationRegistration(careProfileList, user, familyMembers).map((profile) =>
       displayProfileForUser(profile, user, familyMembers),
     ),
     [careProfileList, familyMembers, user],
@@ -236,27 +238,7 @@ export function App(): ReactElement {
         const remoteData = await loadRemoteAppData(authenticatedUser);
         if (isCancelled) return;
 
-        setFamilyWorkspace(remoteData.workspace);
-        setFamilyMembers(remoteData.familyMembers);
-        setCareProfileList(remoteData.careProfiles);
-        setMedications(remoteData.medications);
-        setTemporaryMedications(remoteData.temporaryMedications);
-        setScans(remoteData.scans);
-        setUser(remoteData.resolvedUser);
-
-        const persistedProfileId = loadCurrentProfileId("");
-        const availableProfiles = profilesAvailableForViewing(
-          remoteData.careProfiles,
-          remoteData.resolvedUser,
-          remoteData.familyMembers,
-        );
-        const nextProfileId = availableProfiles.some((profile) => profile.id === persistedProfileId)
-          ? persistedProfileId
-          : defaultProfileIdForUser(availableProfiles, remoteData.resolvedUser, "");
-        if (nextProfileId) {
-          saveCurrentProfileId(nextProfileId);
-          setCurrentProfileId(nextProfileId);
-        }
+        applyRemoteData(remoteData);
       } catch (error) {
         console.error(error);
       } finally {
@@ -272,6 +254,36 @@ export function App(): ReactElement {
       isCancelled = true;
     };
   }, [authResolved, user?.id]);
+
+  function applyRemoteData(remoteData: RemoteAppData): void {
+    setFamilyWorkspace(remoteData.workspace);
+    setFamilyMembers(remoteData.familyMembers);
+    setCareProfileList(remoteData.careProfiles);
+    setMedications(remoteData.medications);
+    setTemporaryMedications(remoteData.temporaryMedications);
+    setScans(remoteData.scans);
+    setUser(remoteData.resolvedUser);
+
+    const persistedProfileId = loadCurrentProfileId("");
+    const availableProfiles = profilesAvailableForViewing(
+      remoteData.careProfiles,
+      remoteData.resolvedUser,
+      remoteData.familyMembers,
+    );
+    const nextProfileId = availableProfiles.some((profile) => profile.id === persistedProfileId)
+      ? persistedProfileId
+      : defaultProfileIdForUser(availableProfiles, remoteData.resolvedUser, "");
+    if (nextProfileId) {
+      saveCurrentProfileId(nextProfileId);
+      setCurrentProfileId(nextProfileId);
+    }
+  }
+
+  async function refreshRemoteWorkspace(baseUser: DemoUser | null): Promise<void> {
+    if (!supabase || !baseUser) return;
+    const remoteData = await loadRemoteAppData(baseUser);
+    applyRemoteData(remoteData);
+  }
 
   useEffect(() => {
     if (!user || !accessibleCareProfiles.length) return;
@@ -435,6 +447,48 @@ export function App(): ReactElement {
     );
   }
 
+  async function handleAddFamilyMember(
+    member: Pick<FamilyMember, "displayName" | "email" | "role">,
+  ): Promise<void> {
+    if (supabase) {
+      const savedMember = await createRemoteFamilyMember({
+        workspaceId: familyWorkspace.id,
+        displayName: member.displayName,
+        email: member.email,
+        role: member.role,
+      });
+      setFamilyMembers((current) => [
+        ...current.filter((item) => item.id !== savedMember.id),
+        savedMember,
+      ]);
+      await refreshRemoteWorkspace(user);
+      return;
+    }
+
+    const profileId = `profile-member-${crypto.randomUUID()}`;
+    const nextMember: FamilyMember = {
+      id: `member-${crypto.randomUUID()}`,
+      workspaceId: familyWorkspace.id,
+      userId: "",
+      role: member.role,
+      displayName: member.displayName,
+      email: member.email,
+      accessibleProfileIds: [profileId],
+      careProfileId: profileId,
+    };
+    const nextProfile: CareProfile = {
+      id: profileId,
+      workspaceId: familyWorkspace.id,
+      name: member.displayName,
+      type: "self",
+      ageGroup: "40",
+      notes: "가족 구성원 본인의 복용 기록입니다.",
+    };
+
+    setFamilyMembers((current) => [...current, nextMember]);
+    setCareProfileList((current) => [...current, nextProfile]);
+  }
+
   async function handleAddCareProfile(profile: CareProfile): Promise<void> {
     if (supabase) {
       const savedProfile = await createRemoteCareProfile(profile);
@@ -574,6 +628,7 @@ export function App(): ReactElement {
           careProfiles={careProfileList}
           familyMembers={familyMembers}
           medications={medications}
+          onAddMember={handleAddFamilyMember}
           onAddCareProfile={handleAddCareProfile}
           onDeleteCareProfile={handleDeleteCareProfile}
           onUpdateCareProfile={handleUpdateCareProfile}
@@ -646,7 +701,9 @@ function displayProfileForUser(
   familyMembers: FamilyMember[],
 ): CareProfile {
   if (profile.name === "나") {
-    const ownerName = familyMembers.find((member) => member.userId === profile.ownerUserId)?.displayName;
+    const ownerName = familyMembers.find(
+      (member) => member.userId === profile.ownerUserId || member.careProfileId === profile.id,
+    )?.displayName;
     if (ownerName) return { ...profile, name: ownerName };
     if (user?.name && (!profile.ownerUserId || profile.ownerUserId === user.id)) {
       return { ...profile, name: user.name };
@@ -659,13 +716,17 @@ function displayProfileForUser(
 function profilesAvailableForMedicationRegistration(
   profiles: CareProfile[],
   user: DemoUser | null,
+  familyMembers: FamilyMember[],
 ): CareProfile[] {
   if (!user) return [];
   if (user.familyRole === "owner" || user.familyRole === "manager" || user.role === "admin") {
     return profiles;
   }
 
-  const ownProfiles = profiles.filter((profile) => profile.ownerUserId === user.id);
+  const member = familyMembers.find((item) => item.userId === user.id);
+  const ownProfiles = profiles.filter(
+    (profile) => profile.ownerUserId === user.id || profile.id === member?.careProfileId,
+  );
   return ownProfiles.length ? ownProfiles : profiles.filter((profile) => profile.name === "나");
 }
 
@@ -681,7 +742,7 @@ function profilesAvailableForViewing(
 
   const member = familyMembers.find((item) => item.userId === user.id);
   const ownProfileIds = profiles
-    .filter((profile) => profile.ownerUserId === user.id)
+    .filter((profile) => profile.ownerUserId === user.id || profile.id === member?.careProfileId)
     .map((profile) => profile.id);
   const allowedProfileIds = new Set([...(member?.accessibleProfileIds || []), ...ownProfileIds]);
 

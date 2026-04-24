@@ -43,6 +43,7 @@ export interface FamilyMember {
   displayName: string;
   email: string;
   accessibleProfileIds: string[];
+  careProfileId?: string;
 }
 
 export interface CareProfile {

@@ -32,6 +32,7 @@ interface FamilyMemberRow {
   display_name: string;
   email: string | null;
   accessible_profile_ids: string[] | null;
+  care_profile_id: string | null;
 }
 
 interface CareProfileRow {
@@ -159,6 +160,7 @@ function mapFamilyMember(row: FamilyMemberRow): FamilyMember {
     displayName: row.display_name,
     email: row.email || "",
     accessibleProfileIds: row.accessible_profile_ids || [],
+    careProfileId: row.care_profile_id || undefined,
   };
 }
 
@@ -277,7 +279,7 @@ export async function loadRemoteAppData(baseUser: DemoUser): Promise<RemoteAppDa
     client.from("family_workspaces").select("id, name, owner_user_id").eq("id", workspaceId).single<WorkspaceRow>(),
     client
       .from("family_members")
-      .select("id, workspace_id, user_id, role, display_name, email, accessible_profile_ids")
+      .select("id, workspace_id, user_id, role, display_name, email, accessible_profile_ids, care_profile_id")
       .eq("workspace_id", workspaceId)
       .order("created_at", { ascending: true })
       .returns<FamilyMemberRow[]>(),
@@ -546,11 +548,40 @@ export async function updateRemoteFamilyMember(
     .from("family_members")
     .update(nextPatch)
     .eq("id", memberId)
-    .select("id, workspace_id, user_id, role, display_name, email, accessible_profile_ids")
+    .select("id, workspace_id, user_id, role, display_name, email, accessible_profile_ids, care_profile_id")
     .single<FamilyMemberRow>();
 
   if (error || !data) {
     throw new Error(error?.message || "가족 구성원 정보를 저장하지 못했습니다.");
+  }
+
+  const member = mapFamilyMember(data);
+
+  if (member.careProfileId && patch.displayName !== undefined) {
+    await client.from("care_profiles").update({ name: patch.displayName }).eq("id", member.careProfileId);
+  }
+
+  return member;
+}
+
+export async function createRemoteFamilyMember(args: {
+  workspaceId: string;
+  displayName: string;
+  email: string;
+  role: FamilyRole;
+}): Promise<FamilyMember> {
+  const client = requireSupabase();
+  const { data, error } = await client
+    .rpc("create_family_invite", {
+      target_workspace: args.workspaceId,
+      invite_name: args.displayName,
+      invite_email: args.email,
+      invite_role: args.role,
+    })
+    .single<FamilyMemberRow>();
+
+  if (error || !data) {
+    throw new Error(error?.message || "가족 구성원을 추가하지 못했습니다.");
   }
 
   return mapFamilyMember(data);

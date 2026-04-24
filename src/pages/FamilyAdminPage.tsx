@@ -15,6 +15,7 @@ interface FamilyAdminPageProps {
   careProfiles: CareProfile[];
   familyMembers: FamilyMember[];
   medications: Medication[];
+  onAddMember: (member: Pick<FamilyMember, "displayName" | "email" | "role">) => Promise<void> | void;
   onAddCareProfile: (profile: CareProfile) => Promise<void> | void;
   onDeleteCareProfile: (profileId: string) => Promise<void> | void;
   onUpdateCareProfile: (profileId: string, patch: Partial<CareProfile>) => Promise<void> | void;
@@ -30,6 +31,7 @@ export function FamilyAdminPage({
   careProfiles,
   familyMembers,
   medications,
+  onAddMember,
   onAddCareProfile,
   onDeleteCareProfile,
   onUpdateCareProfile,
@@ -60,6 +62,13 @@ export function FamilyAdminPage({
   const [petSaveNote, setPetSaveNote] = useState("");
   const [isSyncingCatalog, setIsSyncingCatalog] = useState(false);
   const [catalogSyncNote, setCatalogSyncNote] = useState("");
+  const [isMemberFormOpen, setIsMemberFormOpen] = useState(false);
+  const [memberForm, setMemberForm] = useState({
+    displayName: "",
+    email: "",
+    role: "member" as FamilyRole,
+  });
+  const [memberSaveNote, setMemberSaveNote] = useState("");
 
   useEffect(() => {
     setDraftMembers(familyMembers);
@@ -103,6 +112,47 @@ export function FamilyAdminPage({
       setSavedMemberId(member.id);
     } catch (error) {
       setPetSaveNote(error instanceof Error ? error.message : "가족 구성원 저장 중 문제가 발생했습니다.");
+    }
+  }
+
+  function updateMemberForm(field: keyof typeof memberForm, value: string): void {
+    setMemberSaveNote("");
+    setMemberForm((current) => ({
+      ...current,
+      [field]: field === "role" ? (value as FamilyRole) : value,
+    }));
+  }
+
+  async function addFamilyMember(): Promise<void> {
+    const displayName = memberForm.displayName.trim();
+    const email = memberForm.email.trim().toLocaleLowerCase("ko-KR");
+
+    if (!displayName) {
+      setMemberSaveNote("이름을 입력해 주세요.");
+      return;
+    }
+
+    if (!email) {
+      setMemberSaveNote("로그인에 사용할 이메일을 입력해 주세요.");
+      return;
+    }
+
+    if (familyMembers.some((member) => member.email.trim().toLocaleLowerCase("ko-KR") === email)) {
+      setMemberSaveNote("이미 등록된 이메일입니다.");
+      return;
+    }
+
+    try {
+      await onAddMember({
+        displayName,
+        email,
+        role: memberForm.role === "owner" ? "member" : memberForm.role,
+      });
+      setMemberForm({ displayName: "", email: "", role: "member" });
+      setMemberSaveNote(`${displayName} 추가 완료. 이 이메일로 로그인하면 같은 가족공간에 연결됩니다.`);
+      setIsMemberFormOpen(false);
+    } catch (error) {
+      setMemberSaveNote(error instanceof Error ? error.message : "가족 구성원 추가 중 문제가 발생했습니다.");
     }
   }
 
@@ -297,10 +347,61 @@ export function FamilyAdminPage({
       </section>
 
       <section className="card">
-        <div className="section-heading">
-          <p className="eyebrow">Members</p>
-          <h2>가족 구성원 관리</h2>
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow">Members</p>
+            <h2>가족 구성원 관리</h2>
+            <p className="muted">
+              이메일을 등록해 두면 해당 가족이 Google/Kakao로 로그인할 때 같은 가족공간에 연결됩니다.
+            </p>
+          </div>
+          <button
+            className={isMemberFormOpen ? "ghost-button pet-toggle-button is-open" : "ghost-button pet-toggle-button"}
+            onClick={() => setIsMemberFormOpen((current) => !current)}
+            type="button"
+          >
+            {isMemberFormOpen ? "추가 접기" : "가족 추가"}
+          </button>
         </div>
+        {isMemberFormOpen && (
+          <div className="collapsible-panel member-invite-panel">
+            <div className="member-edit-fields">
+              <label>
+                이름
+                <input
+                  onChange={(event) => updateMemberForm("displayName", event.target.value)}
+                  placeholder="예) 공윤아"
+                  value={memberForm.displayName}
+                />
+              </label>
+              <label>
+                로그인 이메일
+                <input
+                  onChange={(event) => updateMemberForm("email", event.target.value)}
+                  placeholder="가족이 로그인할 이메일"
+                  type="email"
+                  value={memberForm.email}
+                />
+              </label>
+              <label>
+                권한
+                <select
+                  onChange={(event) => updateMemberForm("role", event.target.value)}
+                  value={memberForm.role}
+                >
+                  <option value="member">member</option>
+                  <option value="manager">manager</option>
+                </select>
+              </label>
+            </div>
+            <div className="form-action-row">
+              <button className="primary-button" onClick={addFamilyMember} type="button">
+                구성원 추가
+              </button>
+            </div>
+          </div>
+        )}
+        {memberSaveNote && <span className="save-note saved-pop">{memberSaveNote}</span>}
         <div className="member-edit-list">
           {draftMembers.map((member) => (
             <article className="member-edit-card" key={member.id}>
@@ -594,7 +695,9 @@ function petSummaryLine(profile: CareProfile): string {
 }
 
 function ownProfileIdsForMember(member: FamilyMember, profiles: CareProfile[]): string[] {
-  return profiles.filter((profile) => profile.ownerUserId === member.userId).map((profile) => profile.id);
+  return profiles
+    .filter((profile) => profile.ownerUserId === member.userId || profile.id === member.careProfileId)
+    .map((profile) => profile.id);
 }
 
 function normalizedAccessibleProfileIds(member: FamilyMember, profiles: CareProfile[]): string[] {

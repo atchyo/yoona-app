@@ -435,6 +435,20 @@ img {
   padding: 8px 10px;
 }
 
+.text-danger-button {
+  border: 1px solid rgba(220, 38, 38, 0.22);
+  border-radius: var(--radius);
+  background: rgba(220, 38, 38, 0.07);
+  color: var(--color-danger);
+  font: inherit;
+  padding: 6px 9px;
+}
+
+.text-danger-button:disabled {
+  cursor: progress;
+  opacity: 0.68;
+}
+
 .primary-button.secondary {
   border-color: var(--color-primary-strong);
   background: var(--color-primary-strong);
@@ -1053,6 +1067,30 @@ textarea {
   border-radius: var(--radius);
   background: var(--color-surface-alt);
   padding: 7px 9px;
+}
+
+.medication-mini-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.medication-mini-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  padding: 7px 8px 7px 10px;
+}
+
+.medication-mini-list span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .profile-actions {

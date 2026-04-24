@@ -165,7 +165,9 @@ function profileRoleLabel(
   user: DemoUser,
 ): string {
   if (profile.type === "pet") return "반려";
-  const member = familyMembers.find((item) => item.userId === profile.ownerUserId);
+  const member = familyMembers.find(
+    (item) => item.userId === profile.ownerUserId || item.careProfileId === profile.id,
+  );
   if (user.role === "admin") return "관리";
   if (member?.role === "owner") return "대표";
   if (member?.role === "manager") return "관리";
