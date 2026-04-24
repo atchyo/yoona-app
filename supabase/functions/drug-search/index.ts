@@ -46,6 +46,9 @@ const HEALTH_FUNCTIONAL_FOOD_MAX_PAGES = 20;
 const HEALTH_FUNCTIONAL_FOOD_CACHE_TTL_MS = 1000 * 60 * 30;
 const RESULT_LIMIT = 20;
 const CATALOG_QUERY_LIMIT = 80;
+const CATALOG_TOKEN_QUERY_LIMIT = 300;
+const CATALOG_SELECT_COLUMNS =
+  "source, source_record_id, category, product_name, manufacturer, ingredients, dosage_form, efficacy, usage, warnings, interactions, search_text, search_compact";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -102,6 +105,32 @@ async function searchCatalog(
   const tokens = buildSearchTokens(query);
   if (!rawLike && !compactLike) return [];
 
+  if (tokens.length > 1) {
+    const rowMap = new Map<string, CatalogSearchRow>();
+
+    for (const token of tokens) {
+      const { data } = await adminClient
+        .from("drug_catalog_items")
+        .select(CATALOG_SELECT_COLUMNS)
+        .ilike("search_compact", `%${token}%`)
+        .limit(CATALOG_TOKEN_QUERY_LIMIT)
+        .returns<CatalogSearchRow[]>();
+
+      (data || []).forEach((row) => rowMap.set(`${row.source}:${row.source_record_id}`, row));
+    }
+
+    const tokenRows = Array.from(rowMap.values());
+    const tokenMatchedRows = tokenRows.filter((row) =>
+      tokens.every((token) => row.search_compact.includes(token)),
+    );
+
+    if (tokenMatchedRows.length) {
+      return tokenMatchedRows
+        .map((row) => toCatalogMatch(query, row))
+        .sort((left, right) => compareMatches(query, left, right));
+    }
+  }
+
   const filters = [];
   if (rawLike) filters.push(`search_text.ilike.%${rawLike}%`);
   if (compactLike) filters.push(`search_compact.ilike.%${compactLike}%`);
@@ -112,9 +141,7 @@ async function searchCatalog(
 
   const { data, error } = await adminClient
     .from("drug_catalog_items")
-    .select(
-      "source, source_record_id, category, product_name, manufacturer, ingredients, dosage_form, efficacy, usage, warnings, interactions, search_text, search_compact",
-    )
+    .select(CATALOG_SELECT_COLUMNS)
     .or(filters.join(","))
     .limit(CATALOG_QUERY_LIMIT)
     .returns<CatalogSearchRow[]>();
