@@ -526,6 +526,51 @@ export async function saveConfirmedMedication(
   const authUser = await requireAuthenticatedUser();
   const savedScan = await insertScan(scan);
 
+  const existing = await client
+    .from("medications")
+    .select(
+      "id, workspace_id, care_profile_id, status, product_name, nickname, source, ingredients, dosage, instructions, warnings, interactions, started_at, review_at",
+    )
+    .eq("workspace_id", scan.workspaceId)
+    .eq("care_profile_id", medication.careProfileId)
+    .eq("source", medication.source)
+    .eq("product_name", medication.productName)
+    .limit(1)
+    .maybeSingle<MedicationRow>();
+
+  if (existing.error) {
+    throw new Error(existing.error.message);
+  }
+
+  if (existing.data) {
+    const { data, error } = await client
+      .from("medications")
+      .update({
+        status: medication.status,
+        nickname: medication.nickname || null,
+        ingredients: medication.ingredients,
+        dosage: medication.dosage || null,
+        instructions: medication.instructions || null,
+        warnings: medication.warnings,
+        interactions: medication.interactions,
+        review_at: medication.reviewAt || existing.data.review_at || null,
+      })
+      .eq("id", existing.data.id)
+      .select(
+        "id, workspace_id, care_profile_id, status, product_name, nickname, source, ingredients, dosage, instructions, warnings, interactions, started_at, review_at",
+      )
+      .single<MedicationRow>();
+
+    if (error || !data) {
+      throw new Error(error?.message || "약 정보를 갱신하지 못했습니다.");
+    }
+
+    return {
+      medication: mapMedication(data),
+      scan: savedScan,
+    };
+  }
+
   const { data, error } = await client
     .from("medications")
     .insert({
@@ -566,6 +611,40 @@ export async function saveTemporaryMedication(
   const client = requireSupabase();
   const authUser = await requireAuthenticatedUser();
   const savedScan = await insertScan(scan);
+
+  const existing = await client
+    .from("temporary_medications")
+    .select("id, workspace_id, care_profile_id, raw_name, raw_text, note, created_at")
+    .eq("workspace_id", scan.workspaceId)
+    .eq("care_profile_id", medication.careProfileId)
+    .eq("raw_name", medication.rawName)
+    .limit(1)
+    .maybeSingle<TemporaryMedicationRow>();
+
+  if (existing.error) {
+    throw new Error(existing.error.message);
+  }
+
+  if (existing.data) {
+    const { data, error } = await client
+      .from("temporary_medications")
+      .update({
+        raw_text: medication.rawText,
+        note: medication.note || null,
+      })
+      .eq("id", existing.data.id)
+      .select("id, workspace_id, care_profile_id, raw_name, raw_text, note, created_at")
+      .single<TemporaryMedicationRow>();
+
+    if (error || !data) {
+      throw new Error(error?.message || "임시약 정보를 갱신하지 못했습니다.");
+    }
+
+    return {
+      medication: mapTemporaryMedication(data),
+      scan: savedScan,
+    };
+  }
 
   const { data, error } = await client
     .from("temporary_medications")
