@@ -3,6 +3,7 @@ import type { ReactElement } from "react";
 import type {
   CareProfile,
   DemoUser,
+  FamilyInvitation,
   FamilyMember,
   FamilyRole,
   FamilyWorkspace,
@@ -13,12 +14,14 @@ import type {
 
 interface FamilyAdminPageProps {
   careProfiles: CareProfile[];
+  familyInvitations: FamilyInvitation[];
   familyMembers: FamilyMember[];
   medications: Medication[];
   onAddMember: (member: Pick<FamilyMember, "displayName" | "email" | "role">) => Promise<void> | void;
   onAddCareProfile: (profile: CareProfile) => Promise<void> | void;
   onDeleteCareProfile: (profileId: string) => Promise<void> | void;
   onDeleteMember: (memberId: string) => Promise<void> | void;
+  onRevokeInvitation: (invitationId: string) => Promise<void> | void;
   onUpdateCareProfile: (profileId: string, patch: Partial<CareProfile>) => Promise<void> | void;
   onUpdateMember: (memberId: string, patch: Partial<FamilyMember>) => Promise<void> | void;
   scans: OcrScan[];
@@ -30,12 +33,14 @@ interface FamilyAdminPageProps {
 
 export function FamilyAdminPage({
   careProfiles,
+  familyInvitations,
   familyMembers,
   medications,
   onAddMember,
   onAddCareProfile,
   onDeleteCareProfile,
   onDeleteMember,
+  onRevokeInvitation,
   onUpdateCareProfile,
   onUpdateMember,
   scans,
@@ -72,6 +77,7 @@ export function FamilyAdminPage({
   });
   const [memberSaveNote, setMemberSaveNote] = useState("");
   const [deletingMemberId, setDeletingMemberId] = useState("");
+  const [revokingInvitationId, setRevokingInvitationId] = useState("");
 
   useEffect(() => {
     setDraftMembers(familyMembers);
@@ -143,6 +149,22 @@ export function FamilyAdminPage({
     }
   }
 
+  async function revokeInvitation(invitation: FamilyInvitation): Promise<void> {
+    const confirmed = window.confirm(`${invitation.displayName}님 초대를 취소할까요?`);
+    if (!confirmed) return;
+
+    setRevokingInvitationId(invitation.id);
+    setMemberSaveNote("");
+    try {
+      await onRevokeInvitation(invitation.id);
+      setMemberSaveNote(`${invitation.displayName} 초대 취소 완료`);
+    } catch (error) {
+      setMemberSaveNote(error instanceof Error ? error.message : "초대 취소 중 문제가 발생했습니다.");
+    } finally {
+      setRevokingInvitationId("");
+    }
+  }
+
   function updateMemberForm(field: keyof typeof memberForm, value: string): void {
     setMemberSaveNote("");
     setMemberForm((current) => ({
@@ -170,6 +192,17 @@ export function FamilyAdminPage({
       return;
     }
 
+    if (
+      familyInvitations.some(
+        (invitation) =>
+          invitation.status === "pending" &&
+          invitation.email.trim().toLocaleLowerCase("ko-KR") === email,
+      )
+    ) {
+      setMemberSaveNote("이미 초대 대기 중인 이메일입니다.");
+      return;
+    }
+
     try {
       await onAddMember({
         displayName,
@@ -177,7 +210,7 @@ export function FamilyAdminPage({
         role: memberForm.role === "owner" ? "member" : memberForm.role,
       });
       setMemberForm({ displayName: "", email: "", role: "member" });
-      setMemberSaveNote(`${displayName} 추가 완료. 이 이메일로 로그인하면 같은 가족공간에 연결됩니다.`);
+      setMemberSaveNote(`${displayName}님에게 가족공간 초대를 만들었습니다. 상대가 수락하면 연결됩니다.`);
       setIsMemberFormOpen(false);
     } catch (error) {
       setMemberSaveNote(error instanceof Error ? error.message : "가족 구성원 추가 중 문제가 발생했습니다.");
@@ -380,7 +413,7 @@ export function FamilyAdminPage({
             <p className="eyebrow">Members</p>
             <h2>가족 구성원 관리</h2>
             <p className="muted">
-              이메일을 등록해 두면 해당 가족이 Google/Kakao로 로그인할 때 같은 가족공간에 연결됩니다.
+              이메일로 가족공간 초대를 보내고, 상대가 직접 수락해야 같은 공간에 연결됩니다.
             </p>
           </div>
           <button
@@ -430,6 +463,31 @@ export function FamilyAdminPage({
           </div>
         )}
         {memberSaveNote && <span className="save-note saved-pop">{memberSaveNote}</span>}
+        {familyInvitations.filter((invitation) => invitation.status === "pending").length > 0 && (
+          <div className="pending-invite-list" aria-label="대기 중인 가족 초대">
+            {familyInvitations
+              .filter((invitation) => invitation.status === "pending")
+              .map((invitation) => (
+                <article className="pending-invite-card" key={invitation.id}>
+                  <div>
+                    <strong>{invitation.displayName}</strong>
+                    <span>{invitation.email}</span>
+                  </div>
+                  <div>
+                    <span>{roleLabel(invitation.role)}</span>
+                    <button
+                      className="danger-button table-action"
+                      disabled={revokingInvitationId === invitation.id}
+                      onClick={() => void revokeInvitation(invitation)}
+                      type="button"
+                    >
+                      {revokingInvitationId === invitation.id ? "취소 중" : "초대 취소"}
+                    </button>
+                  </div>
+                </article>
+              ))}
+          </div>
+        )}
         <div className="member-edit-list">
           {draftMembers.map((member) => (
             <article className="member-edit-card" key={member.id}>

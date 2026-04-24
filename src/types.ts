@@ -35,6 +35,23 @@ export interface FamilyWorkspace {
   ownerUserId: string;
 }
 
+export type FamilyInvitationStatus = "pending" | "accepted" | "declined" | "revoked";
+
+export interface FamilyInvitation {
+  id: string;
+  workspaceId: string;
+  workspaceName?: string;
+  email: string;
+  displayName: string;
+  role: Exclude<FamilyRole, "owner">;
+  status: FamilyInvitationStatus;
+  invitedBy?: string;
+  acceptedBy?: string;
+  careProfileId?: string;
+  createdAt: string;
+  respondedAt?: string;
+}
+
 export interface FamilyMember {
   id: string;
   workspaceId: string;

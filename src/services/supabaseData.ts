@@ -3,6 +3,7 @@ import type {
   CareProfile,
   DemoUser,
   DrugDatabaseMatch,
+  FamilyInvitation,
   FamilyMember,
   FamilyRole,
   FamilyWorkspace,
@@ -33,6 +34,21 @@ interface FamilyMemberRow {
   email: string | null;
   accessible_profile_ids: string[] | null;
   care_profile_id: string | null;
+}
+
+interface FamilyInvitationRow {
+  id: string;
+  workspace_id: string;
+  workspace_name: string | null;
+  email: string;
+  display_name: string;
+  role: Exclude<FamilyRole, "owner">;
+  status: FamilyInvitation["status"];
+  invited_by: string | null;
+  accepted_by: string | null;
+  care_profile_id: string | null;
+  created_at: string;
+  responded_at: string | null;
 }
 
 interface CareProfileRow {
@@ -110,7 +126,9 @@ interface DrugMatchRow {
 
 export interface RemoteAppData {
   workspace: FamilyWorkspace;
+  workspaces: FamilyWorkspace[];
   familyMembers: FamilyMember[];
+  familyInvitations: FamilyInvitation[];
   careProfiles: CareProfile[];
   medications: Medication[];
   temporaryMedications: TemporaryMedication[];
@@ -161,6 +179,23 @@ function mapFamilyMember(row: FamilyMemberRow): FamilyMember {
     email: row.email || "",
     accessibleProfileIds: row.accessible_profile_ids || [],
     careProfileId: row.care_profile_id || undefined,
+  };
+}
+
+function mapFamilyInvitation(row: FamilyInvitationRow): FamilyInvitation {
+  return {
+    id: row.id,
+    workspaceId: row.workspace_id,
+    workspaceName: row.workspace_name || undefined,
+    email: row.email,
+    displayName: row.display_name,
+    role: row.role,
+    status: row.status,
+    invitedBy: row.invited_by || undefined,
+    acceptedBy: row.accepted_by || undefined,
+    careProfileId: row.care_profile_id || undefined,
+    createdAt: row.created_at,
+    respondedAt: row.responded_at || undefined,
   };
 }
 
@@ -258,25 +293,50 @@ function mapScan(
   };
 }
 
-export async function loadRemoteAppData(baseUser: DemoUser): Promise<RemoteAppData> {
+export async function loadRemoteAppData(
+  baseUser: DemoUser,
+  preferredWorkspaceId = "",
+): Promise<RemoteAppData> {
   const client = requireSupabase();
   const authUser = await requireAuthenticatedUser();
 
-  const { data: workspaceId, error: bootstrapError } = await client.rpc("ensure_personal_workspace");
+  const { data: workspaceId, error: bootstrapError } = await client.rpc("ensure_personal_workspace", {
+    preferred_workspace_id: preferredWorkspaceId || null,
+  });
   if (bootstrapError || !workspaceId) {
     throw new Error(bootstrapError?.message || "가족 워크스페이스를 준비하지 못했습니다.");
   }
 
+  const { data: workspaceMembershipRows, error: workspaceMembershipError } = await client
+    .from("family_members")
+    .select("workspace_id")
+    .eq("user_id", authUser.id)
+    .returns<Array<{ workspace_id: string }>>();
+
+  if (workspaceMembershipError) throw new Error(workspaceMembershipError.message);
+
+  const workspaceIds = Array.from(
+    new Set([workspaceId, ...(workspaceMembershipRows || []).map((row) => row.workspace_id)].filter(Boolean)),
+  );
+
   const [
     workspaceResponse,
+    workspacesResponse,
     memberResponse,
     profileResponse,
     medicationResponse,
     temporaryMedicationResponse,
     scanResponse,
     userProfileResponse,
+    invitationResponse,
   ] = await Promise.all([
     client.from("family_workspaces").select("id, name, owner_user_id").eq("id", workspaceId).single<WorkspaceRow>(),
+    client
+      .from("family_workspaces")
+      .select("id, name, owner_user_id")
+      .in("id", workspaceIds)
+      .order("created_at", { ascending: true })
+      .returns<WorkspaceRow[]>(),
     client
       .from("family_members")
       .select("id, workspace_id, user_id, role, display_name, email, accessible_profile_ids, care_profile_id")
@@ -310,17 +370,21 @@ export async function loadRemoteAppData(baseUser: DemoUser): Promise<RemoteAppDa
       .order("created_at", { ascending: false })
       .returns<OcrScanRow[]>(),
     client.from("profiles").select("id, display_name, avatar_url").eq("id", authUser.id).single<ProfileRow>(),
+    client.rpc("list_family_invitations", { active_workspace_id: workspaceId }),
   ]);
 
   if (workspaceResponse.error) throw new Error(workspaceResponse.error.message);
+  if (workspacesResponse.error) throw new Error(workspacesResponse.error.message);
   if (memberResponse.error) throw new Error(memberResponse.error.message);
   if (profileResponse.error) throw new Error(profileResponse.error.message);
   if (medicationResponse.error) throw new Error(medicationResponse.error.message);
   if (temporaryMedicationResponse.error) throw new Error(temporaryMedicationResponse.error.message);
   if (scanResponse.error) throw new Error(scanResponse.error.message);
   if (userProfileResponse.error) throw new Error(userProfileResponse.error.message);
+  if (invitationResponse.error) throw new Error(invitationResponse.error.message);
 
   const familyMembers = (memberResponse.data || []).map(mapFamilyMember);
+  const familyInvitations = ((invitationResponse.data || []) as FamilyInvitationRow[]).map(mapFamilyInvitation);
   const careProfiles = (profileResponse.data || []).map(mapCareProfile);
   const medications = (medicationResponse.data || []).map(mapMedication);
   const temporaryMedications = (temporaryMedicationResponse.data || []).map(mapTemporaryMedication);
@@ -370,7 +434,9 @@ export async function loadRemoteAppData(baseUser: DemoUser): Promise<RemoteAppDa
 
   return {
     workspace: mapWorkspace(workspaceResponse.data),
+    workspaces: (workspacesResponse.data || []).map(mapWorkspace),
     familyMembers,
+    familyInvitations,
     careProfiles,
     medications,
     temporaryMedications,
@@ -566,27 +632,56 @@ export async function deleteRemoteFamilyMember(memberId: string): Promise<void> 
   if (error) throw new Error(error.message);
 }
 
-export async function createRemoteFamilyMember(args: {
+export async function createRemoteFamilyInvitation(args: {
   workspaceId: string;
   displayName: string;
   email: string;
   role: FamilyRole;
-}): Promise<FamilyMember> {
+}): Promise<FamilyInvitation> {
   const client = requireSupabase();
   const { data, error } = await client
-    .rpc("create_family_invite", {
+    .rpc("create_family_invitation", {
       target_workspace: args.workspaceId,
       invite_name: args.displayName,
       invite_email: args.email,
       invite_role: args.role,
     })
-    .single<FamilyMemberRow>();
+    .single<FamilyInvitationRow>();
 
   if (error || !data) {
-    throw new Error(error?.message || "가족 구성원을 추가하지 못했습니다.");
+    throw new Error(error?.message || "가족 초대를 만들지 못했습니다.");
   }
 
-  return mapFamilyMember(data);
+  return mapFamilyInvitation(data);
+}
+
+export async function acceptRemoteFamilyInvitation(
+  invitationId: string,
+  importPersonalRecords: boolean,
+): Promise<string> {
+  const client = requireSupabase();
+  const { data, error } = await client.rpc("accept_family_invitation", {
+    invitation_id: invitationId,
+    import_personal_records: importPersonalRecords,
+  });
+
+  if (error || !data) {
+    throw new Error(error?.message || "가족 초대를 수락하지 못했습니다.");
+  }
+
+  return String(data);
+}
+
+export async function declineRemoteFamilyInvitation(invitationId: string): Promise<void> {
+  const client = requireSupabase();
+  const { error } = await client.rpc("decline_family_invitation", { invitation_id: invitationId });
+  if (error) throw new Error(error.message);
+}
+
+export async function revokeRemoteFamilyInvitation(invitationId: string): Promise<void> {
+  const client = requireSupabase();
+  const { error } = await client.rpc("revoke_family_invitation", { invitation_id: invitationId });
+  if (error) throw new Error(error.message);
 }
 
 export async function createRemoteCareProfile(profile: CareProfile): Promise<CareProfile> {

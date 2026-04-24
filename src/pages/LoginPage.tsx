@@ -19,8 +19,8 @@ export function LoginPage({
         <div className="login-copy">
           <p className="eyebrow">Opti-Me V2</p>
           <h1>
-            <span>나와 가족,</span>
-            <span>반려동물의 건강 루틴까지.</span>
+            <span>가족과 반려동물,</span>
+            <span>건강 루틴을 한곳에서.</span>
           </h1>
           <p>
             약과 영양제 기록, 복용 주기, 장기복용 검토와 반려동물 케어 정보를 한곳에서 확인하세요.
@@ -38,7 +38,7 @@ export function LoginPage({
         </div>
         <h2 id="login-title">옵티미에 로그인</h2>
         <p className="muted">
-          나를 최적화하는 건강관리 습관을 가족과 함께 시작하세요.
+          최적화된 건강관리 습관을 가족과 함께 시작하세요.
         </p>
         <div className="login-actions">
           <button

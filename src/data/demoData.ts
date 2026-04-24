@@ -65,7 +65,7 @@ export const careProfiles: CareProfile[] = [
     id: "profile-self",
     workspaceId: workspace.id,
     ownerUserId: "user-owner",
-    name: "나",
+    name: "김정웅",
     type: "self",
     ageGroup: "40",
     notes: "영양제와 감기약 중복 복용을 자주 확인합니다.",

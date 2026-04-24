@@ -11,6 +11,7 @@ import type {
 export const storageKeys = {
   theme: "optime.theme",
   demoUser: "optime.demoUser",
+  activeWorkspace: "optime.activeWorkspace",
   currentProfile: "optime.currentProfile",
   medications: "optime.medications",
   temporaryMedications: "optime.temporaryMedications",
@@ -46,6 +47,18 @@ export function saveUser(user: DemoUser): void {
 
 export function clearUser(): void {
   window.localStorage.removeItem(storageKeys.demoUser);
+}
+
+export function loadActiveWorkspaceId(): string {
+  return window.localStorage.getItem(storageKeys.activeWorkspace) || "";
+}
+
+export function saveActiveWorkspaceId(workspaceId: string): void {
+  if (workspaceId) {
+    window.localStorage.setItem(storageKeys.activeWorkspace, workspaceId);
+  } else {
+    window.localStorage.removeItem(storageKeys.activeWorkspace);
+  }
 }
 
 export function loadCurrentProfileId(defaultId: string): string {

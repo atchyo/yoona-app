@@ -20,12 +20,15 @@ import { ServiceAdminPage } from "./pages/ServiceAdminPage";
 import { appConfig } from "./config";
 import { syncDrugCatalog as syncRemoteDrugCatalog } from "./services/drugSearch";
 import {
+  acceptRemoteFamilyInvitation,
   createRemoteCareProfile,
-  createRemoteFamilyMember,
+  createRemoteFamilyInvitation,
   deleteRemoteCareProfile,
   deleteRemoteFamilyMember,
   deleteRemoteMedication,
+  declineRemoteFamilyInvitation,
   loadRemoteAppData,
+  revokeRemoteFamilyInvitation,
   saveConfirmedMedication,
   saveTemporaryMedication,
   updateRemoteCareProfile,
@@ -36,6 +39,7 @@ import { signOutSupabase, supabase } from "./services/supabaseClient";
 import {
   clearUser,
   loadCareProfiles,
+  loadActiveWorkspaceId,
   loadCurrentProfileId,
   loadFamilyMembers,
   loadMedications,
@@ -44,6 +48,7 @@ import {
   loadTheme,
   loadUser,
   saveCareProfiles,
+  saveActiveWorkspaceId,
   saveCurrentProfileId,
   saveFamilyMembers,
   saveMedications,
@@ -56,6 +61,7 @@ import type {
   CareProfile,
   DemoUser,
   FamilyMember,
+  FamilyInvitation,
   FamilyWorkspace,
   Medication,
   MedicationLog,
@@ -73,6 +79,7 @@ export function App(): ReactElement {
   const [dataResolved, setDataResolved] = useState<boolean>(() => !supabase);
   const [route, setRoute] = useState<Route>(() => getInitialRoute());
   const [familyWorkspace, setFamilyWorkspace] = useState<FamilyWorkspace>(seedWorkspace);
+  const [availableWorkspaces, setAvailableWorkspaces] = useState<FamilyWorkspace[]>([seedWorkspace]);
   const [careProfileList, setCareProfileList] = useState<CareProfile[]>(() =>
     supabase ? [] : migrateDemoCareProfiles(loadCareProfiles(seedCareProfiles)),
   );
@@ -94,6 +101,7 @@ export function App(): ReactElement {
           migrateDemoCareProfiles(loadCareProfiles(seedCareProfiles)),
         ),
   );
+  const [familyInvitations, setFamilyInvitations] = useState<FamilyInvitation[]>([]);
   const [logs, setLogs] = useState<MedicationLog[]>([]);
 
   const currentProfile = useMemo(
@@ -241,7 +249,7 @@ export function App(): ReactElement {
       setDataResolved(false);
 
       try {
-        const remoteData = await loadRemoteAppData(authenticatedUser);
+        const remoteData = await loadRemoteAppData(authenticatedUser, loadActiveWorkspaceId());
         if (isCancelled) return;
 
         applyRemoteData(remoteData);
@@ -263,7 +271,10 @@ export function App(): ReactElement {
 
   function applyRemoteData(remoteData: RemoteAppData): void {
     setFamilyWorkspace(remoteData.workspace);
+    saveActiveWorkspaceId(remoteData.workspace.id);
+    setAvailableWorkspaces(remoteData.workspaces.length ? remoteData.workspaces : [remoteData.workspace]);
     setFamilyMembers(remoteData.familyMembers);
+    setFamilyInvitations(remoteData.familyInvitations);
     setCareProfileList(remoteData.careProfiles);
     setMedications(remoteData.medications);
     setTemporaryMedications(remoteData.temporaryMedications);
@@ -287,7 +298,7 @@ export function App(): ReactElement {
 
   async function refreshRemoteWorkspace(baseUser: DemoUser | null): Promise<void> {
     if (!supabase || !baseUser) return;
-    const remoteData = await loadRemoteAppData(baseUser);
+    const remoteData = await loadRemoteAppData(baseUser, loadActiveWorkspaceId());
     applyRemoteData(remoteData);
   }
 
@@ -333,6 +344,18 @@ export function App(): ReactElement {
   function handleProfileChange(profileId: string): void {
     saveCurrentProfileId(profileId);
     setCurrentProfileId(profileId);
+  }
+
+  async function handleWorkspaceChange(workspaceId: string): Promise<void> {
+    if (!workspaceId || workspaceId === familyWorkspace.id) return;
+
+    saveActiveWorkspaceId(workspaceId);
+    setDataResolved(false);
+    try {
+      await refreshRemoteWorkspace(user);
+    } finally {
+      setDataResolved(true);
+    }
   }
 
   function selectDefaultProfileForUser(nextUser: DemoUser): void {
@@ -463,15 +486,15 @@ export function App(): ReactElement {
     member: Pick<FamilyMember, "displayName" | "email" | "role">,
   ): Promise<void> {
     if (supabase) {
-      const savedMember = await createRemoteFamilyMember({
+      const invitation = await createRemoteFamilyInvitation({
         workspaceId: familyWorkspace.id,
         displayName: member.displayName,
         email: member.email,
         role: member.role,
       });
-      setFamilyMembers((current) => [
-        ...current.filter((item) => item.id !== savedMember.id),
-        savedMember,
+      setFamilyInvitations((current) => [
+        invitation,
+        ...current.filter((item) => item.id !== invitation.id),
       ]);
       await refreshRemoteWorkspace(user);
       return;
@@ -533,6 +556,34 @@ export function App(): ReactElement {
         handleProfileChange(nextProfileId);
       }
     }
+  }
+
+  async function handleAcceptInvitation(invitationId: string, importPersonalRecords: boolean): Promise<void> {
+    if (!supabase) return;
+
+    const workspaceId = await acceptRemoteFamilyInvitation(invitationId, importPersonalRecords);
+    saveActiveWorkspaceId(workspaceId);
+    await refreshRemoteWorkspace(user);
+  }
+
+  async function handleDeclineInvitation(invitationId: string): Promise<void> {
+    if (!supabase) {
+      setFamilyInvitations((current) => current.filter((invitation) => invitation.id !== invitationId));
+      return;
+    }
+
+    await declineRemoteFamilyInvitation(invitationId);
+    await refreshRemoteWorkspace(user);
+  }
+
+  async function handleRevokeInvitation(invitationId: string): Promise<void> {
+    if (!supabase) {
+      setFamilyInvitations((current) => current.filter((invitation) => invitation.id !== invitationId));
+      return;
+    }
+
+    await revokeRemoteFamilyInvitation(invitationId);
+    await refreshRemoteWorkspace(user);
   }
 
   async function handleAddCareProfile(profile: CareProfile): Promise<void> {
@@ -619,18 +670,26 @@ export function App(): ReactElement {
 
   return (
     <AppShell
+      availableWorkspaces={availableWorkspaces}
       availableProfiles={displayCareProfiles}
       currentProfile={displayCurrentProfile}
       familyMembers={familyMembers}
       onLogout={() => void handleLogout()}
       onNavigate={navigate}
       onProfileChange={handleProfileChange}
+      onWorkspaceChange={(workspaceId) => void handleWorkspaceChange(workspaceId)}
       onThemeToggle={() => setTheme(theme === "light" ? "dark" : "light")}
       route={route}
       theme={theme}
       user={user}
       workspace={familyWorkspace}
     >
+      <InvitationInbox
+        invitations={familyInvitations}
+        user={user}
+        onAccept={handleAcceptInvitation}
+        onDecline={handleDeclineInvitation}
+      />
       {route === "/" && (
         <DashboardPage
           careProfiles={displayCareProfiles}
@@ -678,12 +737,14 @@ export function App(): ReactElement {
       {route === "/family" && (
         <FamilyAdminPage
           careProfiles={careProfileList}
+          familyInvitations={familyInvitations}
           familyMembers={familyMembers}
           medications={medications}
           onAddMember={handleAddFamilyMember}
           onAddCareProfile={handleAddCareProfile}
           onDeleteCareProfile={handleDeleteCareProfile}
           onDeleteMember={handleDeleteFamilyMember}
+          onRevokeInvitation={handleRevokeInvitation}
           onUpdateCareProfile={handleUpdateCareProfile}
           onUpdateMember={handleUpdateFamilyMember}
           scans={scans}
@@ -698,6 +759,53 @@ export function App(): ReactElement {
         <p className="sr-only">최근 복용 완료 기록 {logs.length}건</p>
       )}
     </AppShell>
+  );
+}
+
+function InvitationInbox({
+  invitations,
+  onAccept,
+  onDecline,
+  user,
+}: {
+  invitations: FamilyInvitation[];
+  onAccept: (invitationId: string, importPersonalRecords: boolean) => Promise<void>;
+  onDecline: (invitationId: string) => Promise<void>;
+  user: DemoUser;
+}): ReactElement | null {
+  const incomingInvitations = invitations.filter(
+    (invitation) =>
+      invitation.status === "pending" &&
+      invitation.email.toLocaleLowerCase("ko-KR") === user.email.toLocaleLowerCase("ko-KR"),
+  );
+
+  if (!incomingInvitations.length) return null;
+
+  return (
+    <section className="invitation-inbox" aria-label="가족공간 초대">
+      {incomingInvitations.map((invitation) => (
+        <article className="invitation-card" key={invitation.id}>
+          <div>
+            <p className="eyebrow">Family Invite</p>
+            <strong>{invitation.workspaceName || "가족공간"} 초대가 도착했습니다.</strong>
+            <p>
+              수락하면 이 가족공간을 함께 볼 수 있습니다. 기존 개인 복용 기록은 자동으로 합쳐지지 않습니다.
+            </p>
+          </div>
+          <div className="invitation-actions">
+            <button className="ghost-button" onClick={() => void onDecline(invitation.id)} type="button">
+              거절
+            </button>
+            <button className="ghost-button" onClick={() => void onAccept(invitation.id, false)} type="button">
+              기록 없이 참여
+            </button>
+            <button className="primary-button" onClick={() => void onAccept(invitation.id, true)} type="button">
+              내 기록 복사하고 참여
+            </button>
+          </div>
+        </article>
+      ))}
+    </section>
   );
 }
 
@@ -753,14 +861,16 @@ function displayProfileForUser(
   user: DemoUser | null,
   familyMembers: FamilyMember[],
 ): CareProfile {
-  if (profile.name === "나") {
-    const ownerName = familyMembers.find(
-      (member) => member.userId === profile.ownerUserId || member.careProfileId === profile.id,
-    )?.displayName;
-    if (ownerName) return { ...profile, name: ownerName };
-    if (user?.name && (!profile.ownerUserId || profile.ownerUserId === user.id)) {
-      return { ...profile, name: user.name };
-    }
+  const linkedMember = familyMembers.find(
+    (member) => member.userId === profile.ownerUserId || member.careProfileId === profile.id,
+  );
+
+  if (linkedMember?.displayName && profile.type !== "pet") {
+    return { ...profile, name: linkedMember.displayName };
+  }
+
+  if (user?.name && profile.type !== "pet" && (!profile.ownerUserId || profile.ownerUserId === user.id)) {
+    return { ...profile, name: user.name };
   }
 
   return profile;
@@ -780,7 +890,7 @@ function profilesAvailableForMedicationRegistration(
   const ownProfiles = profiles.filter(
     (profile) => profile.ownerUserId === user.id || profile.id === member?.careProfileId,
   );
-  return ownProfiles.length ? ownProfiles : profiles.filter((profile) => profile.name === "나");
+  return ownProfiles.length ? ownProfiles : [];
 }
 
 function profilesAvailableForViewing(
@@ -869,7 +979,7 @@ function migrateDemoFamilyMembers(members: FamilyMember[], profiles: CareProfile
 function migrateDemoCareProfiles(profiles: CareProfile[]): CareProfile[] {
   return profiles.map((profile) => {
     if (profile.id === "profile-self") {
-      return { ...profile, ownerUserId: "user-owner", name: profile.name || "나" };
+      return { ...profile, ownerUserId: "user-owner", name: profile.name === "나" ? "김정웅" : profile.name || "김정웅" };
     }
 
     if (profile.id === "profile-mother") {

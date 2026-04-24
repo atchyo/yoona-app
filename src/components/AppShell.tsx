@@ -36,6 +36,8 @@ interface AppShellProps {
   route: Route;
   theme: ThemeMode;
   familyMembers: FamilyMember[];
+  availableWorkspaces: FamilyWorkspace[];
+  onWorkspaceChange: (workspaceId: string) => void;
   workspace: FamilyWorkspace;
   user: DemoUser;
 }
@@ -45,9 +47,11 @@ export function AppShell({
   children,
   currentProfile,
   familyMembers,
+  availableWorkspaces,
   onLogout,
   onNavigate,
   onProfileChange,
+  onWorkspaceChange,
   onThemeToggle,
   route,
   theme,
@@ -118,13 +122,25 @@ export function AppShell({
               </button>
               {isSpaceMenuOpen && (
                 <div aria-label="공간 선택" className="profile-switcher-menu space-switcher-menu" role="listbox">
-                  <button className="profile-option active" role="option" type="button">
-                    <strong>{workspace.name}</strong>
-                    <span>현재 가족공간</span>
-                  </button>
-                  <div className="space-menu-note">
-                    개인공간 전환은 가족초대 수락 구조와 함께 연결됩니다.
-                  </div>
+                  {availableWorkspaces.map((item) => (
+                    <button
+                      aria-selected={item.id === workspace.id}
+                      className={item.id === workspace.id ? "profile-option active" : "profile-option"}
+                      key={item.id}
+                      onClick={() => {
+                        onWorkspaceChange(item.id);
+                        setIsSpaceMenuOpen(false);
+                      }}
+                      role="option"
+                      type="button"
+                    >
+                      <strong>{item.name}</strong>
+                      <span>{item.id === workspace.id ? "현재 공간" : "공간 전환"}</span>
+                    </button>
+                  ))}
+                  {!availableWorkspaces.length && (
+                    <div className="space-menu-note">사용 가능한 가족공간을 불러오는 중입니다.</div>
+                  )}
                 </div>
               )}
             </div>

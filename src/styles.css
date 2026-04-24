@@ -137,6 +137,7 @@ img {
 .brand-icon {
   width: 58px;
   height: 58px;
+  box-shadow: 0 10px 22px rgba(253, 126, 11, 0.16);
 }
 
 .login-card-head {
@@ -836,6 +837,7 @@ textarea {
 .manual-search {
   grid-template-columns: minmax(0, 1fr) auto;
   margin-bottom: 14px;
+  align-items: stretch;
 }
 
 .search-input-wrap {
@@ -948,7 +950,7 @@ textarea {
 .match-card {
   display: grid;
   min-width: 0;
-  min-height: 196px;
+  min-height: 208px;
   align-content: space-between;
   gap: 12px;
   border: 1px solid var(--color-border);
@@ -960,10 +962,14 @@ textarea {
 
 .match-card > div {
   min-width: 0;
+  display: grid;
+  gap: 8px;
 }
 
 .match-card strong,
 .match-card p {
+  min-width: 0;
+  margin: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -1288,6 +1294,41 @@ textarea {
   gap: 12px;
 }
 
+.pending-invite-list {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 16px;
+}
+
+.pending-invite-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px dashed rgba(22, 119, 255, 0.42);
+  border-radius: var(--radius);
+  background: var(--color-primary-soft);
+  color: var(--color-text);
+  padding: 12px;
+}
+
+.pending-invite-card strong,
+.pending-invite-card span {
+  display: block;
+}
+
+.pending-invite-card span {
+  min-width: 0;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.pending-invite-card > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .member-edit-card {
   display: grid;
   gap: 14px;
@@ -1569,6 +1610,41 @@ td select {
   display: none;
 }
 
+.invitation-inbox {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.invitation-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid rgba(22, 119, 255, 0.28);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-surface));
+  box-shadow: var(--shadow-soft);
+  padding: 16px;
+}
+
+.invitation-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.invitation-card p {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.5;
+}
+
+.invitation-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .login-page {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(360px, 440px);
@@ -1795,6 +1871,22 @@ td select {
   .catalog-sync-actions button,
   .pet-row-actions,
   .pet-row-actions button {
+    width: 100%;
+  }
+
+  .pending-invite-card,
+  .invitation-card,
+  .invitation-actions {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .pending-invite-card > div:last-child,
+  .invitation-actions {
+    flex-direction: column;
+  }
+
+  .invitation-actions button {
     width: 100%;
   }
 
