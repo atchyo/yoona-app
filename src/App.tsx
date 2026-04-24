@@ -13,10 +13,14 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { FamilyAdminPage } from "./pages/FamilyAdminPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MedicationScanPage } from "./pages/MedicationScanPage";
+import { PetAdminPage } from "./pages/PetAdminPage";
 import { ProfilesPage } from "./pages/ProfilesPage";
+import { ReportsPage } from "./pages/ReportsPage";
 import { RemindersPage } from "./pages/RemindersPage";
 import { RuleChatPage } from "./pages/RuleChatPage";
+import { SafetyCheckPage } from "./pages/SafetyCheckPage";
 import { ServiceAdminPage } from "./pages/ServiceAdminPage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { appConfig } from "./config";
 import {
   acceptRemoteFamilyInvitation,
@@ -247,7 +251,7 @@ export function App(): ReactElement {
       replaceRoute("/");
     }
 
-    if (user && user.familyRole === "member" && route === "/family") {
+    if (user && user.familyRole === "member" && (route === "/family" || route === "/pets")) {
       setRoute("/");
       replaceRoute("/");
     }
@@ -350,7 +354,7 @@ export function App(): ReactElement {
       return;
     }
 
-    if (nextRoute === "/family" && user?.familyRole === "member") {
+    if ((nextRoute === "/family" || nextRoute === "/pets") && user?.familyRole === "member") {
       pushRoute("/");
       setRoute("/");
       return;
@@ -760,7 +764,9 @@ export function App(): ReactElement {
           familyMembers={familyMembers}
           medications={medications}
           onNavigateChat={() => navigate("/chat")}
+          onNavigateInteractions={() => navigate("/interactions")}
           onNavigateProfiles={() => navigate("/profiles")}
+          onNavigateReports={() => navigate("/reports")}
           onNavigateReminders={() => navigate("/reminders")}
           onNavigateScan={() => navigate("/scan")}
           scans={scans}
@@ -788,6 +794,13 @@ export function App(): ReactElement {
           temporaryMedications={temporaryMedications}
         />
       )}
+      {route === "/interactions" && (
+        <SafetyCheckPage
+          careProfiles={displayCareProfiles}
+          currentProfile={displayCurrentProfile}
+          medications={medications}
+        />
+      )}
       {route === "/reminders" && (
         <RemindersPage
           currentProfile={displayCurrentProfile}
@@ -801,6 +814,16 @@ export function App(): ReactElement {
       )}
       {route === "/chat" && (
         <RuleChatPage currentProfile={displayCurrentProfile} medications={medications} />
+      )}
+      {route === "/reports" && (
+        <ReportsPage
+          careProfiles={displayCareProfiles}
+          currentProfileId={currentProfile.id}
+          familyMembers={familyMembers}
+          medications={medications}
+          schedules={effectiveSchedules}
+          temporaryMedications={temporaryMedications}
+        />
       )}
       {route === "/family" && (
         <FamilyAdminPage
@@ -817,6 +840,25 @@ export function App(): ReactElement {
           onUpdateMember={handleUpdateFamilyMember}
           scans={scans}
           temporaryMedications={temporaryMedications}
+          user={user}
+          workspace={familyWorkspace}
+        />
+      )}
+      {route === "/pets" && (
+        <PetAdminPage
+          careProfiles={careProfileList}
+          medications={medications}
+          onAddCareProfile={handleAddCareProfile}
+          onDeleteCareProfile={handleDeleteCareProfile}
+          onUpdateCareProfile={handleUpdateCareProfile}
+          workspace={familyWorkspace}
+        />
+      )}
+      {route === "/settings" && (
+        <SettingsPage
+          availableWorkspaceCount={availableWorkspaces.length}
+          onThemeToggle={() => setTheme(theme === "light" ? "dark" : "light")}
+          theme={theme}
           user={user}
           workspace={familyWorkspace}
         />
@@ -904,8 +946,12 @@ function normalizeRoute(path: string): Route {
       "/scan",
       "/profiles",
       "/reminders",
+      "/interactions",
       "/chat",
+      "/reports",
       "/family",
+      "/pets",
+      "/settings",
       "/service-admin",
       "/login",
     ].includes(normalized)

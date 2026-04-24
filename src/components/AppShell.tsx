@@ -8,8 +8,12 @@ export type Route =
   | "/scan"
   | "/profiles"
   | "/reminders"
+  | "/interactions"
   | "/chat"
+  | "/reports"
   | "/family"
+  | "/pets"
+  | "/settings"
   | "/service-admin"
   | "/login";
 
@@ -18,8 +22,12 @@ const navItems: Array<{ path: Route; label: string; shortLabel: string; icon: st
   { path: "/scan", label: "약 관리", shortLabel: "약관리", icon: "약" },
   { path: "/profiles", label: "복용 기록", shortLabel: "기록", icon: "록" },
   { path: "/reminders", label: "복약 알림", shortLabel: "알림", icon: "알" },
+  { path: "/interactions", label: "상호작용 체크", shortLabel: "체크", icon: "체" },
   { path: "/chat", label: "AI 건강 상담", shortLabel: "상담", icon: "AI" },
+  { path: "/reports", label: "리포트 출력", shortLabel: "리포트", icon: "표" },
   { path: "/family", label: "가족 관리", shortLabel: "가족", icon: "가", ownerOnly: true },
+  { path: "/pets", label: "반려동물 관리", shortLabel: "반려", icon: "반", ownerOnly: true },
+  { path: "/settings", label: "설정", shortLabel: "설정", icon: "설" },
   { path: "/service-admin", label: "서비스 관리", shortLabel: "관리", icon: "관", adminOnly: true },
 ];
 
@@ -65,9 +73,13 @@ export function AppShell({
     if (item.ownerOnly) return user.familyRole === "owner" || user.familyRole === "manager";
     return true;
   });
-  const mobileItems = visibleItems
-    .filter((item) => item.path !== "/service-admin" && item.path !== "/chat")
-    .slice(0, 5);
+  const preferredMobilePaths: Route[] =
+    user.familyRole === "owner" || user.familyRole === "manager"
+      ? ["/", "/scan", "/profiles", "/reminders", "/family"]
+      : ["/", "/scan", "/profiles", "/reminders", "/settings"];
+  const mobileItems = preferredMobilePaths
+    .map((path) => visibleItems.find((item) => item.path === path))
+    .filter(Boolean) as typeof visibleItems;
   const currentRoute = navItems.find((item) => item.path === route) || navItems[0];
 
   return (
@@ -222,8 +234,12 @@ function routeTitle(route: Route, userName: string): string {
   if (route === "/scan") return "약 정보를 등록하고 검색해요";
   if (route === "/profiles") return "가족 복용 기록을 확인해요";
   if (route === "/reminders") return "복약 시간을 관리해요";
+  if (route === "/interactions") return "성분 중복과 주의 조합을 확인해요";
   if (route === "/chat") return "등록 약 기준으로 상담을 준비해요";
+  if (route === "/reports") return "병원 방문용 복약 리포트를 만들어요";
   if (route === "/family") return "가족과 반려동물 권한을 관리해요";
+  if (route === "/pets") return "반려동물 건강 기록을 관리해요";
+  if (route === "/settings") return "계정과 화면 설정을 확인해요";
   if (route === "/service-admin") return "서비스 데이터를 관리해요";
   return "Opti-Me";
 }
@@ -233,8 +249,12 @@ function routeSubtitle(route: Route): string {
   if (route === "/scan") return "사진 촬영, 파일 첨부, 약명 검색으로 복용약을 등록합니다.";
   if (route === "/profiles") return "병원 방문 전 복용약과 성분을 빠르게 확인할 수 있습니다.";
   if (route === "/reminders") return "정해진 시간과 장기복용 검토일을 놓치지 않게 관리합니다.";
+  if (route === "/interactions") return "확정 약과 영양제 기준으로 성분 중복, 주의 조합, 검토 항목을 봅니다.";
   if (route === "/chat") return "의료 판단이 아니라 성분 중복과 주의사항 확인을 돕습니다.";
+  if (route === "/reports") return "가족을 케어해 병원에 갈 때 필요한 복용 정보를 한 장으로 정리합니다.";
   if (route === "/family") return "초대와 권한, 반려동물 정보를 한곳에서 정리합니다.";
+  if (route === "/pets") return "반려동물의 나이, 체중, 알러지, 사료, 금지 음식을 함께 관리합니다.";
+  if (route === "/settings") return "로그인 계정, 가족공간, 화면 모드와 데이터 안내를 확인합니다.";
   return "가족 건강 관리를 위한 기본 데이터를 확인합니다.";
 }
 

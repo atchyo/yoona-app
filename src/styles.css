@@ -3226,6 +3226,379 @@ td select {
   }
 }
 
+.safety-page,
+.reports-page,
+.pet-admin-page,
+.settings-page {
+  display: grid;
+  gap: 18px;
+}
+
+.safety-hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 260px);
+  align-items: center;
+  gap: 18px;
+}
+
+.safety-hero-card h2,
+.report-preview-card h2,
+.pet-detail-panel h2,
+.settings-profile-card h2 {
+  word-break: keep-all;
+}
+
+.safety-score-panel {
+  display: grid;
+  gap: 7px;
+  border-radius: var(--radius);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  padding: 18px;
+}
+
+.safety-score-panel strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.segmented-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.segmented-tabs button {
+  min-height: 42px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-muted);
+  padding: 0 16px;
+  font-weight: 700;
+}
+
+.segmented-tabs button.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.safety-current-grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  gap: 16px;
+}
+
+.safety-profile-list,
+.report-type-list,
+.pet-profile-list,
+.finding-stack,
+.family-safety-list,
+.report-finding-list,
+.settings-bullet-list {
+  display: grid;
+  gap: 10px;
+}
+
+.safety-profile,
+.report-type-button,
+.pet-profile-button {
+  display: grid;
+  gap: 5px;
+  min-height: 68px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 12px;
+  text-align: left;
+}
+
+.safety-profile.active,
+.report-type-button.active,
+.pet-profile-button.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.safety-profile span,
+.report-type-button span,
+.pet-profile-button span {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.ingredient-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ingredient-strip article,
+.guide-card,
+.family-safety-card,
+.pet-medication-row {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--color-surface) 84%, var(--color-surface-alt));
+  padding: 14px;
+}
+
+.ingredient-strip article,
+.pet-medication-row {
+  display: grid;
+  gap: 6px;
+}
+
+.ingredient-strip span,
+.pet-medication-row span {
+  color: var(--color-muted);
+}
+
+.finding-stack .warning-box,
+.finding-stack .danger-box,
+.report-finding-list article {
+  display: grid;
+  gap: 8px;
+}
+
+.finding-stack .warning-box > div,
+.finding-stack .danger-box > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.finding-stack.compact .warning-box,
+.finding-stack.compact .danger-box {
+  padding: 12px;
+}
+
+.safety-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.guide-card p {
+  margin: 8px 0 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.reports-page {
+  grid-template-columns: minmax(250px, 320px) minmax(0, 1fr);
+}
+
+.report-page-toolbar,
+.report-control-row,
+.printable-report header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.report-control-row select {
+  min-width: 180px;
+}
+
+.printable-report {
+  display: grid;
+  gap: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  margin-top: 18px;
+  padding: 24px;
+}
+
+.printable-report header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 16px;
+}
+
+.printable-report h3,
+.printable-report h4 {
+  margin: 0;
+}
+
+.printable-report header span {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.report-table {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.report-table-head,
+.report-table-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(200px, 1.2fr) minmax(160px, 1fr) minmax(160px, 1fr);
+  gap: 12px;
+  padding: 12px;
+}
+
+.report-table-head {
+  background: var(--color-surface-strong);
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.report-table-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.report-table-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-muted);
+}
+
+.pet-admin-page {
+  grid-template-columns: minmax(230px, 290px) minmax(0, 1fr);
+}
+
+.pet-add-panel {
+  grid-column: 1 / -1;
+}
+
+.pet-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.pet-detail-grid label {
+  display: grid;
+  gap: 7px;
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.pet-detail-wide {
+  grid-column: 1 / -1;
+}
+
+.pet-medication-panel {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.pet-medication-panel h3 {
+  margin: 0;
+}
+
+.settings-page {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.settings-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.settings-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 10px;
+}
+
+.settings-list dt {
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.settings-list dd {
+  margin: 0;
+  text-align: right;
+}
+
+.theme-large-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(100%, 320px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-strong);
+  padding: 4px;
+}
+
+.theme-large-toggle span {
+  display: grid;
+  min-height: 42px;
+  place-items: center;
+  border-radius: var(--radius);
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.theme-large-toggle span.active {
+  background: var(--color-surface);
+  color: var(--color-primary-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+.settings-bullet-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 1180px) {
+  .reports-page,
+  .pet-admin-page,
+  .settings-page {
+    grid-template-columns: 1fr;
+  }
+
+  .report-type-panel,
+  .pet-list-panel {
+    order: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .safety-hero-card,
+  .safety-current-grid,
+  .report-page-toolbar,
+  .report-control-row,
+  .printable-report header {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .safety-score-panel {
+    width: 100%;
+  }
+
+  .report-table-head {
+    display: none;
+  }
+
+  .report-table-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pet-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media print {
   .sidebar,
   .topbar,

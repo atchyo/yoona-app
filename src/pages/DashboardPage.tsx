@@ -12,7 +12,9 @@ interface DashboardPageProps {
   onNavigateScan: () => void;
   onNavigateProfiles: () => void;
   onNavigateReminders: () => void;
+  onNavigateInteractions: () => void;
   onNavigateChat: () => void;
+  onNavigateReports: () => void;
 }
 
 export function DashboardPage({
@@ -24,7 +26,9 @@ export function DashboardPage({
   onNavigateScan,
   onNavigateProfiles,
   onNavigateReminders,
+  onNavigateInteractions,
   onNavigateChat,
+  onNavigateReports,
 }: DashboardPageProps): ReactElement {
   const profileMeds = medications.filter((medication) => medication.careProfileId === currentProfile.id);
   const findings = careProfiles.flatMap((profile) =>
@@ -50,8 +54,8 @@ export function DashboardPage({
       <section className="summary-grid">
         <SummaryCard label="복용 중인 약" value={`${medications.length}개`} action="전체 보기" onClick={onNavigateProfiles} />
         <SummaryCard label="오늘 복용 예정" value={`${todaySchedules.length}개`} action="일정 보기" onClick={onNavigateReminders} />
-        <SummaryCard label="주의 상호작용" value={`${findings.length}건`} action="확인하기" tone="danger" onClick={onNavigateProfiles} />
-        <SummaryCard label="이번 주 리포트" value={`${Math.max(1, familyProfiles.length)}개`} action="출력하기" onClick={onNavigateProfiles} />
+        <SummaryCard label="주의 상호작용" value={`${findings.length}건`} action="확인하기" tone="danger" onClick={onNavigateInteractions} />
+        <SummaryCard label="이번 주 리포트" value={`${Math.max(1, familyProfiles.length)}개`} action="출력하기" onClick={onNavigateReports} />
       </section>
 
       <section className="dashboard-main-grid">
@@ -98,7 +102,7 @@ export function DashboardPage({
             <div className="interaction-alert">
               <strong>{findings[0].profile.name} · {findings[0].title}</strong>
               <p>{findings[0].message}</p>
-              <button className="ghost-button" onClick={onNavigateProfiles} type="button">자세히 보기</button>
+              <button className="ghost-button" onClick={onNavigateInteractions} type="button">자세히 보기</button>
             </div>
           ) : (
             <div className="safe-box">현재 등록 약 기준으로 중대한 충돌은 표시되지 않았습니다.</div>
@@ -155,7 +159,7 @@ export function DashboardPage({
               <p className="eyebrow">Current</p>
               <h2>{currentProfile.name} 복용약</h2>
             </div>
-            <button className="text-button" onClick={onNavigateProfiles} type="button">전체 보기</button>
+            <button className="text-button" onClick={onNavigateReports} type="button">전체 보기</button>
           </div>
           <div className="mini-record-list">
             {profileMeds.slice(0, 5).map((medication) => (
@@ -196,7 +200,7 @@ export function DashboardPage({
               </div>
             ))}
           </div>
-          <button className="primary-button wide" onClick={onNavigateProfiles} type="button">새 리포트 생성</button>
+          <button className="primary-button wide" onClick={onNavigateReports} type="button">새 리포트 생성</button>
         </article>
       </section>
 
