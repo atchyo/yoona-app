@@ -45,6 +45,30 @@ Functions, not in the browser:
 DATA_GO_KR_SERVICE_KEY=...
 ```
 
+### Drug Catalog Batch Sync
+
+Full public-DB indexing should be run as an admin batch job, not from the web UI.
+Keep `SUPABASE_SERVICE_ROLE_KEY` on your local machine or a private server only.
+Never commit it or put it in a Vite/browser env file.
+
+```bash
+export SUPABASE_URL=...
+export SUPABASE_SERVICE_ROLE_KEY=...
+export DATA_GO_KR_SERVICE_KEY=...
+
+npm run sync:drug-catalog -- --source=mfds_health --pages=20
+npm run sync:drug-catalog -- --source=mfds_permit --pages=20
+npm run sync:drug-catalog -- --source=mfds_easy --pages=20
+```
+
+Use `--start-page=21` to continue after a partial run. Use `--all-pages` only
+when you are ready to let the job run for a long time:
+
+```bash
+npm run sync:drug-catalog -- --source=mfds_health --start-page=21 --pages=20
+npm run sync:drug-catalog -- --source=all --all-pages
+```
+
 ## Data Sources
 
 - MFDS drug product permission API for Korean product/ingredient data.
