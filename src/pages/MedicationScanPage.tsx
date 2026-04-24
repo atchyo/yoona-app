@@ -387,7 +387,8 @@ export function MedicationScanPage({
           <p className="eyebrow">Drug Database Matches</p>
           <h2>공식 DB 후보 확인</h2>
           <p className="muted">
-            실제 공식 데이터베이스 검색 결과만 표시합니다. 후보가 없으면 수기 입력 후 임시약으로 저장해 주세요.
+            실제 공식 데이터베이스 검색 결과만 표시합니다. 관련도 높은 후보를 최대 20개까지 보여주고,
+            후보가 없으면 수기 입력 후 임시약으로 저장해 주세요.
           </p>
         </div>
         <div className="manual-search">

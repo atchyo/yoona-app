@@ -950,7 +950,7 @@ textarea {
 .match-card {
   display: grid;
   min-width: 0;
-  min-height: 208px;
+  min-height: 232px;
   align-content: space-between;
   gap: 12px;
   border: 1px solid var(--color-border);
@@ -966,6 +966,15 @@ textarea {
   gap: 8px;
 }
 
+.match-card strong {
+  display: -webkit-box;
+  min-height: 2.7em;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.35;
+}
+
 .match-card strong,
 .match-card p {
   min-width: 0;
@@ -975,12 +984,17 @@ textarea {
 }
 
 .match-card p {
+  display: -webkit-box;
   color: var(--color-muted);
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .match-card .primary-button {
   width: 100%;
   min-width: 0;
+  min-height: 52px;
   margin-top: 6px;
   white-space: normal;
 }
@@ -1030,6 +1044,163 @@ textarea {
 .chat-submit-button {
   width: 100%;
   margin-top: 16px;
+}
+
+.reminder-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: 18px;
+}
+
+.reminder-main-card,
+.reminder-side,
+.chat-history-panel,
+.chat-context-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.reminder-table {
+  display: grid;
+  gap: 8px;
+}
+
+.reminder-table-head,
+.reminder-table-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) 120px 132px;
+  align-items: center;
+  gap: 14px;
+}
+
+.reminder-table-head {
+  color: var(--color-muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 0 14px;
+}
+
+.reminder-table-row {
+  min-height: 76px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  padding: 12px 14px;
+}
+
+.reminder-table-row time {
+  color: var(--color-primary-strong);
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.reminder-table-row strong,
+.reminder-table-row span {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.reminder-table-row span {
+  color: var(--color-muted);
+}
+
+.empty-panel {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  color: var(--color-muted);
+  padding: 18px;
+  text-align: center;
+}
+
+.setting-list {
+  display: grid;
+  gap: 10px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  padding: 10px 12px;
+}
+
+.setting-row input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  accent-color: var(--color-primary);
+}
+
+.chat-page {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 18px;
+}
+
+.question-list {
+  display: grid;
+  gap: 8px;
+}
+
+.question-item {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  padding: 11px 12px;
+  text-align: left;
+}
+
+.question-item.active {
+  border-color: rgba(22, 119, 255, 0.35);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.chat-room-panel {
+  display: grid;
+  grid-template-rows: auto minmax(360px, 1fr) auto;
+  gap: 16px;
+  min-height: 620px;
+}
+
+.chat-message-list {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.chat-message-list .chat-bubble {
+  width: min(680px, 100%);
+  margin: 0;
+}
+
+.chat-message-list .chat-bubble.user {
+  justify-self: end;
+  width: auto;
+  max-width: min(540px, 88%);
+}
+
+.chat-bubble.assistant {
+  background: var(--color-surface-alt);
+}
+
+.chat-bubble small {
+  display: block;
+  margin-top: 10px;
+  color: var(--color-muted);
+  line-height: 1.55;
 }
 
 .page-grid {
@@ -2436,6 +2607,45 @@ td select {
 
   .row-heading {
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 1040px) {
+  .reminder-page,
+  .chat-page {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-room-panel {
+    min-height: auto;
+  }
+
+  .chat-message-list {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 720px) {
+  .reminder-table-head {
+    display: none;
+  }
+
+  .reminder-table-row {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .reminder-table-row > span,
+  .reminder-table-row > button {
+    grid-column: 1 / -1;
+  }
+
+  .reminder-table-row > button,
+  .chat-input-row > button {
+    width: 100%;
+  }
+
+  .chat-message-list .chat-bubble.user {
+    max-width: 100%;
   }
 }
 

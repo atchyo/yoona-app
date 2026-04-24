@@ -41,8 +41,8 @@ interface HealthFunctionalFoodListItem {
 let healthFunctionalFoodCache:
   | { expiresAt: number; items: HealthFunctionalFoodListItem[] }
   | null = null;
-const HEALTH_FUNCTIONAL_FOOD_PAGE_SIZE = 100;
-const HEALTH_FUNCTIONAL_FOOD_MAX_PAGES = 25;
+const HEALTH_FUNCTIONAL_FOOD_PAGE_SIZE = 500;
+const HEALTH_FUNCTIONAL_FOOD_MAX_PAGES = 20;
 const HEALTH_FUNCTIONAL_FOOD_CACHE_TTL_MS = 1000 * 60 * 30;
 const RESULT_LIMIT = 20;
 const CATALOG_QUERY_LIMIT = 80;
@@ -275,7 +275,7 @@ async function searchHealthFunctionalFood(query: string): Promise<DrugMatch[]> {
       confidence: 0.62,
     }))
     .sort((left, right) => compareMatches(query, left, right))
-    .slice(0, 5);
+    .slice(0, RESULT_LIMIT);
 }
 
 async function searchRxNorm(query: string): Promise<DrugMatch[]> {
