@@ -5,6 +5,7 @@ import { join } from "node:path";
 const publicDir = join(process.cwd(), "public");
 const sourceSvgPath = join(publicDir, "opti_me_app_icon.svg");
 const sourcePngPath = join(publicDir, "opti_me_app_icon.png");
+const flattenedJpegPath = join(publicDir, ".opti_me_app_icon_flat.jpg");
 
 const iconSvg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
@@ -47,6 +48,8 @@ const iconSvg = `<?xml version="1.0" encoding="UTF-8"?>
 
 writeFileSync(sourceSvgPath, iconSvg);
 execFileSync("sips", ["-s", "format", "png", sourceSvgPath, "--out", sourcePngPath], { stdio: "ignore" });
+execFileSync("sips", ["-s", "format", "jpeg", sourcePngPath, "--out", flattenedJpegPath], { stdio: "ignore" });
+execFileSync("sips", ["-s", "format", "png", flattenedJpegPath, "--out", sourcePngPath], { stdio: "ignore" });
 
 for (const [fileName, size] of [
   ["apple-touch-icon.png", 180],
@@ -57,6 +60,10 @@ for (const [fileName, size] of [
   execFileSync("sips", ["-z", String(size), String(size), sourcePngPath, "--out", join(publicDir, fileName)], {
     stdio: "ignore",
   });
+}
+
+if (existsSync(flattenedJpegPath)) {
+  rmSync(flattenedJpegPath);
 }
 
 if (existsSync(join(publicDir, "favicon.ico"))) {

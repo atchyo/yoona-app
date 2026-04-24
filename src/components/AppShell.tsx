@@ -14,13 +14,13 @@ export type Route =
   | "/login";
 
 const navItems: Array<{ path: Route; label: string; shortLabel: string; icon: string; ownerOnly?: boolean; adminOnly?: boolean }> = [
-  { path: "/", label: "대시보드", shortLabel: "홈", icon: "D" },
-  { path: "/scan", label: "약 관리", shortLabel: "약관리", icon: "M" },
-  { path: "/profiles", label: "복용 기록", shortLabel: "기록", icon: "R" },
-  { path: "/reminders", label: "복약 알림", shortLabel: "알림", icon: "A" },
-  { path: "/chat", label: "AI 건강 상담", shortLabel: "상담", icon: "C" },
-  { path: "/family", label: "가족 관리", shortLabel: "가족", icon: "F", ownerOnly: true },
-  { path: "/service-admin", label: "서비스 관리", shortLabel: "관리", icon: "S", adminOnly: true },
+  { path: "/", label: "대시보드", shortLabel: "홈", icon: "홈" },
+  { path: "/scan", label: "약 관리", shortLabel: "약관리", icon: "약" },
+  { path: "/profiles", label: "복용 기록", shortLabel: "기록", icon: "록" },
+  { path: "/reminders", label: "복약 알림", shortLabel: "알림", icon: "알" },
+  { path: "/chat", label: "AI 건강 상담", shortLabel: "상담", icon: "AI" },
+  { path: "/family", label: "가족 관리", shortLabel: "가족", icon: "가", ownerOnly: true },
+  { path: "/service-admin", label: "서비스 관리", shortLabel: "관리", icon: "관", adminOnly: true },
 ];
 
 const appIconSrc = `${import.meta.env.BASE_URL}opti_me_app_icon.png`;
@@ -109,6 +109,12 @@ export function AppShell({
             <p>{routeSubtitle(route)}</p>
           </div>
           <div className="topbar-actions">
+            <button className="topbar-icon-button" aria-label="알림" type="button">
+              <span aria-hidden="true">!</span>
+            </button>
+            <button className="ghost-button topbar-help-button" type="button">
+              도움말
+            </button>
             <div className="space-switcher">
               <button
                 aria-expanded={isSpaceMenuOpen}
