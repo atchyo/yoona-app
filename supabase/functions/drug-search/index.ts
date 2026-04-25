@@ -46,7 +46,7 @@ const HEALTH_FUNCTIONAL_FOOD_MAX_PAGES = 20;
 const HEALTH_FUNCTIONAL_FOOD_CACHE_TTL_MS = 1000 * 60 * 30;
 const RESULT_LIMIT = 20;
 const CATALOG_QUERY_LIMIT = 80;
-const CATALOG_TOKEN_QUERY_LIMIT = 300;
+const CATALOG_TOKEN_QUERY_LIMIT = 120;
 const CATALOG_SELECT_COLUMNS =
   "source, source_record_id, category, product_name, manufacturer, ingredients, dosage_form, efficacy, usage, warnings, interactions, search_text, search_compact";
 
@@ -107,16 +107,32 @@ async function searchCatalog(
 
   if (tokens.length > 1) {
     const rowMap = new Map<string, CatalogSearchRow>();
+    const prioritizedTokens = prioritizeTokens(tokens);
 
-    for (const token of tokens) {
-      const { data } = await adminClient
+    for (const token of prioritizedTokens) {
+      let request = adminClient
         .from("drug_catalog_items")
         .select(CATALOG_SELECT_COLUMNS)
-        .ilike("search_compact", `%${token}%`)
-        .limit(CATALOG_TOKEN_QUERY_LIMIT)
-        .returns<CatalogSearchRow[]>();
+        .ilike("search_compact", `%${token}%`);
+
+      if (looksLikeSupplementQuery(query)) {
+        request = request.eq("category", "supplement");
+      }
+
+      const { data } = await request.limit(CATALOG_TOKEN_QUERY_LIMIT).returns<CatalogSearchRow[]>();
 
       (data || []).forEach((row) => rowMap.set(`${row.source}:${row.source_record_id}`, row));
+
+      const exactRows = Array.from(rowMap.values()).filter((row) =>
+        tokens.every((candidate) => row.search_compact.includes(candidate)),
+      );
+
+      if (exactRows.length) {
+        return exactRows
+          .map((row) => toCatalogMatch(query, row))
+          .sort((left, right) => compareMatches(query, left, right))
+          .slice(0, RESULT_LIMIT);
+      }
     }
 
     const tokenRows = Array.from(rowMap.values());
@@ -150,12 +166,15 @@ async function searchCatalog(
   });
   if (!filters.length) return [];
 
-  const { data, error } = await adminClient
+  let request = adminClient
     .from("drug_catalog_items")
-    .select(CATALOG_SELECT_COLUMNS)
-    .or(filters.join(","))
-    .limit(CATALOG_QUERY_LIMIT)
-    .returns<CatalogSearchRow[]>();
+    .select(CATALOG_SELECT_COLUMNS);
+
+  if (looksLikeSupplementQuery(query)) {
+    request = request.eq("category", "supplement");
+  }
+
+  const { data, error } = await request.or(filters.join(",")).limit(CATALOG_QUERY_LIMIT).returns<CatalogSearchRow[]>();
 
   if (error || !data?.length) return [];
 
@@ -179,6 +198,12 @@ function buildSearchTokens(query: string): string[] {
         .filter((token) => token.length >= 2),
     ),
   ).slice(0, 6);
+}
+
+function prioritizeTokens(tokens: string[]): string[] {
+  return [...tokens]
+    .sort((left, right) => right.length - left.length || tokens.indexOf(left) - tokens.indexOf(right))
+    .slice(0, 4);
 }
 
 function scoreCatalogRow(query: string, tokens: string[], row: CatalogSearchRow): number {

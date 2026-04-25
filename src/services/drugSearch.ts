@@ -20,7 +20,7 @@ interface CatalogSearchRow {
 const CATALOG_SELECT_COLUMNS =
   "source, source_record_id, category, product_name, manufacturer, ingredients, dosage_form, efficacy, usage, warnings, interactions, search_text, search_compact";
 const DIRECT_RESULT_LIMIT = 20;
-const TOKEN_QUERY_LIMIT = 300;
+const TOKEN_QUERY_LIMIT = 120;
 
 export interface DrugCatalogSyncSummary {
   source: string;
@@ -74,17 +74,33 @@ async function searchCatalogDirectly(query: string): Promise<DrugDatabaseMatch[]
   const tokens = buildSearchTokens(query);
   if (tokens.length > 1) {
     const rowMap = new Map<string, CatalogSearchRow>();
+    const prioritizedTokens = prioritizeTokens(tokens);
 
-    for (const token of tokens) {
-      const { data, error } = await supabase
+    for (const token of prioritizedTokens) {
+      let request = supabase
         .from("drug_catalog_items")
         .select(CATALOG_SELECT_COLUMNS)
-        .ilike("search_compact", `%${token}%`)
-        .limit(TOKEN_QUERY_LIMIT)
-        .returns<CatalogSearchRow[]>();
+        .ilike("search_compact", `%${token}%`);
+
+      if (looksLikeSupplementQuery(query)) {
+        request = request.eq("category", "supplement");
+      }
+
+      const { data, error } = await request.limit(TOKEN_QUERY_LIMIT).returns<CatalogSearchRow[]>();
 
       if (error) throw new Error(error.message);
       (data || []).forEach((row) => rowMap.set(`${row.source}:${row.source_record_id}`, row));
+
+      const exactRows = Array.from(rowMap.values()).filter((row) => {
+        const compact = row.search_compact || "";
+        return tokens.every((candidate) => compact.includes(candidate));
+      });
+
+      if (exactRows.length) {
+        return dedupeMatches(exactRows.map((row) => mapCatalogRow(query, row)))
+          .sort((left, right) => compareMatches(query, left, right))
+          .slice(0, DIRECT_RESULT_LIMIT);
+      }
     }
 
     const rows = Array.from(rowMap.values()).filter((row) => {
@@ -118,9 +134,15 @@ async function searchCatalogDirectly(query: string): Promise<DrugDatabaseMatch[]
 
   if (!filters.length) return [];
 
-  const { data, error } = await supabase
+  let request = supabase
     .from("drug_catalog_items")
-    .select(CATALOG_SELECT_COLUMNS)
+    .select(CATALOG_SELECT_COLUMNS);
+
+  if (looksLikeSupplementQuery(query)) {
+    request = request.eq("category", "supplement");
+  }
+
+  const { data, error } = await request
     .or(filters.join(","))
     .limit(TOKEN_QUERY_LIMIT)
     .returns<CatalogSearchRow[]>();
@@ -146,6 +168,12 @@ function buildSearchTokens(query: string): string[] {
         .filter((token) => token.length >= 2),
     ),
   ).slice(0, 6);
+}
+
+function prioritizeTokens(tokens: string[]): string[] {
+  return [...tokens]
+    .sort((left, right) => right.length - left.length || tokens.indexOf(left) - tokens.indexOf(right))
+    .slice(0, 4);
 }
 
 function scoreCatalogRow(query: string, tokens: string[], row: CatalogSearchRow): number {
