@@ -7474,6 +7474,725 @@ body {
   }
 }
 
+/* 2026-04-26 reference detail pass: align the secondary app screens with the supplied desktop/mobile frames. */
+.page-content {
+  min-width: 0;
+}
+
+.scan-layout,
+.history-page,
+.reminder-page,
+.reports-page,
+.pet-admin-page,
+.chat-page,
+.safety-page {
+  width: 100%;
+}
+
+.medication-manager-card,
+.db-match-card,
+.registration-card,
+.ocr-result-card,
+.history-filter-panel,
+.history-list-card,
+.reminder-main-card,
+.reminder-side .card,
+.safety-hero-card,
+.safety-workspace,
+.chat-history-panel,
+.chat-room-panel,
+.chat-context-panel .card,
+.report-type-panel,
+.report-preview-card,
+.pet-list-panel,
+.pet-detail-panel,
+.pet-add-panel,
+.family-admin-page .card,
+.workspace-overview-card,
+.member-edit-card,
+.invite-card,
+.pet-admin-card {
+  border: 1px solid var(--color-card-border);
+  border-radius: 8px;
+  background: var(--color-card-bg);
+  box-shadow: none;
+}
+
+.scan-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.scan-layout > .card,
+.medication-manager-card,
+.db-match-card,
+.registration-card,
+.ocr-result-card {
+  grid-column: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.medication-manager-card {
+  padding: 20px;
+}
+
+.medication-manager-card .section-heading,
+.db-match-card .section-heading,
+.history-list-card .section-heading,
+.reminder-main-card .row-heading,
+.report-page-toolbar {
+  margin-bottom: 16px;
+}
+
+.medication-manager-card .section-heading h2,
+.db-match-card .section-heading h2,
+.history-list-card .section-heading h2,
+.reminder-main-card .row-heading h2,
+.report-preview-card h2,
+.chat-room-panel h2,
+.safety-hero-card h2 {
+  font-size: 1.18rem;
+  line-height: 1.35;
+}
+
+.manager-toolbar {
+  align-items: end;
+  margin: 6px 0 14px;
+}
+
+.manager-tabs,
+.history-filter-buttons,
+.scan-mode-switch,
+.segmented-tabs {
+  border-bottom: 1px solid var(--color-card-border);
+}
+
+.manager-tabs button,
+.history-filter-buttons button,
+.scan-mode-switch button,
+.segmented-tabs button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.manager-tabs button.active,
+.history-filter-buttons button.active,
+.scan-mode-switch button.active,
+.segmented-tabs button.active {
+  border-bottom: 2px solid var(--color-primary);
+  background: transparent;
+  color: var(--color-primary-strong);
+}
+
+.medication-table-list,
+.history-table,
+.reminder-table {
+  border: 1px solid var(--color-card-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.medication-table-head,
+.history-table-head,
+.reminder-table-head {
+  min-height: 44px;
+  border-radius: 0;
+  background: #f6f8ff;
+  color: #67738c;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+:root[data-theme="dark"] .medication-table-head,
+:root[data-theme="dark"] .history-table-head,
+:root[data-theme="dark"] .reminder-table-head {
+  background: #252936;
+  color: #aeb8ce;
+}
+
+.medication-table-row,
+.history-table-row,
+.reminder-table-row {
+  border: 0;
+  border-top: 1px solid var(--color-card-border);
+  border-radius: 0;
+  background: var(--color-card-bg);
+}
+
+.medication-table-row strong,
+.history-table-row strong,
+.reminder-table-row strong {
+  line-height: 1.32;
+}
+
+.medication-table-row span,
+.history-table-row span,
+.reminder-table-row span,
+.match-card p,
+.report-medication-card dd,
+.report-medication-card p {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.table-action,
+.medication-table-row .danger-button,
+.history-table-row .primary-button,
+.reminder-actions button {
+  min-height: 36px;
+  border-radius: 8px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.db-match-card {
+  padding: 20px;
+}
+
+.manual-search {
+  grid-template-columns: minmax(0, 1fr) 142px;
+  align-items: stretch;
+}
+
+.search-input-wrap input,
+.manual-search .primary-button {
+  min-height: 54px;
+  border-radius: 8px;
+}
+
+.scan-status {
+  grid-template-columns: 68px minmax(0, 1fr);
+  min-height: 54px;
+  margin: 12px 0;
+}
+
+.registration-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.match-toolbar {
+  margin: 14px 0;
+}
+
+.match-grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.match-card {
+  min-height: 214px;
+  gap: 14px;
+}
+
+.match-card .primary-button {
+  min-height: 44px;
+  align-self: end;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-page {
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.history-filter-panel {
+  padding: 18px;
+}
+
+.history-filter-panel select,
+.history-filter-panel .ghost-button {
+  min-height: 42px;
+}
+
+.history-filter-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 14px 0;
+}
+
+.history-filter-buttons button {
+  padding: 0 8px;
+  text-align: center;
+}
+
+.history-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0 14px;
+}
+
+.history-summary span {
+  display: grid;
+  min-height: 42px;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-weight: 850;
+}
+
+.history-list-card {
+  min-height: 224px;
+  padding: 20px;
+}
+
+.history-table-head,
+.history-table-row {
+  grid-template-columns: 132px minmax(220px, 1fr) minmax(190px, 0.8fr) 116px;
+  padding-right: 14px;
+  padding-left: 14px;
+}
+
+.history-table-row {
+  min-height: 72px;
+}
+
+.history-table-row time {
+  color: var(--color-muted);
+  font-weight: 850;
+}
+
+.reminder-page {
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 20px;
+}
+
+.reminder-main-card,
+.reminder-side .card {
+  padding: 20px;
+}
+
+.reminder-table-head,
+.reminder-table-row {
+  grid-template-columns: 88px minmax(170px, 1fr) minmax(150px, 0.8fr) 210px;
+  gap: 10px;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+.reminder-table-row {
+  min-height: 72px;
+}
+
+.reminder-table-row input {
+  min-width: 0;
+  min-height: 42px;
+  border-radius: 8px;
+}
+
+.reminder-table-row input[aria-label$="알림 문구"] {
+  text-overflow: ellipsis;
+}
+
+.reminder-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.reminder-actions .primary-button,
+.reminder-actions .ghost-button,
+.reminder-actions .danger-button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0 9px;
+  font-size: 0.78rem;
+}
+
+.reminder-side {
+  display: grid;
+  gap: 12px;
+}
+
+.reminder-side .timeline-list,
+.reminder-side .finding-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.safety-page {
+  gap: 20px;
+}
+
+.safety-hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 20px;
+  align-items: center;
+  padding: 20px;
+}
+
+.safety-score-panel {
+  min-height: 92px;
+  border-radius: 8px;
+  background: var(--color-primary-soft);
+}
+
+.safety-workspace {
+  display: block;
+  padding: 20px;
+}
+
+.segmented-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  margin-bottom: 18px;
+}
+
+.segmented-tabs button {
+  min-width: 110px;
+  padding: 0 14px;
+}
+
+.safety-current-grid {
+  grid-template-columns: 238px minmax(0, 1fr);
+  gap: 18px;
+}
+
+.safety-profile-list {
+  align-content: start;
+}
+
+.safety-profile {
+  min-height: 66px;
+  border-color: var(--color-card-border);
+  border-radius: 8px;
+  background: var(--color-card-bg);
+}
+
+.safety-profile.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.safety-result-panel {
+  min-width: 0;
+}
+
+.ingredient-strip {
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.ingredient-strip article,
+.family-safety-card,
+.guide-card {
+  border-color: var(--color-card-border);
+  border-radius: 8px;
+  background: #fbfcff;
+}
+
+:root[data-theme="dark"] .ingredient-strip article,
+:root[data-theme="dark"] .family-safety-card,
+:root[data-theme="dark"] .guide-card {
+  background: #20242e;
+}
+
+.finding-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.finding-stack .warning-box,
+.finding-stack .danger-box,
+.warning-box,
+.danger-box {
+  border-radius: 8px;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.chat-page {
+  grid-template-columns: 270px minmax(0, 1fr) 280px;
+  gap: 20px;
+}
+
+.chat-history-panel,
+.chat-room-panel,
+.chat-context-panel .card {
+  padding: 20px;
+}
+
+.question-list {
+  display: grid;
+  gap: 10px;
+}
+
+.question-item {
+  min-height: 48px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 8px;
+  background: #fbfcff;
+  color: var(--color-text);
+  padding: 10px 12px;
+  text-align: left;
+  word-break: keep-all;
+}
+
+.question-item.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.chat-room-panel {
+  display: grid;
+  min-height: 600px;
+}
+
+.chat-message-list {
+  align-content: start;
+  min-height: 360px;
+  padding: 16px 0;
+}
+
+.chat-bubble.user {
+  justify-self: end;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.chat-input-row {
+  align-self: end;
+}
+
+.chat-input-row input {
+  min-height: 50px;
+  border-radius: 8px;
+}
+
+.chat-input-row .primary-button {
+  display: grid;
+  width: 50px;
+  min-width: 50px;
+  height: 50px;
+  place-items: center;
+  border-radius: 999px;
+  padding: 0;
+  font-size: 0;
+}
+
+.chat-input-row .primary-button::before {
+  content: "➤";
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.reports-page {
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.report-type-panel,
+.report-preview-card {
+  padding: 20px;
+}
+
+.report-type-button {
+  min-height: 88px;
+  border-color: var(--color-card-border);
+  border-radius: 8px;
+  background: var(--color-card-bg);
+}
+
+.report-type-button.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.report-page-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+}
+
+.report-control-row {
+  grid-template-columns: minmax(150px, 190px) 48px;
+}
+
+.report-control-row select,
+.report-control-row .ghost-button {
+  min-height: 48px;
+}
+
+.printable-report {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.report-medication-card {
+  overflow: hidden;
+}
+
+.report-medication-card dl {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.family-admin-page,
+.pet-admin-page {
+  gap: 20px;
+}
+
+.family-admin-page .card,
+.pet-list-panel,
+.pet-detail-panel,
+.pet-add-panel {
+  padding: 20px;
+}
+
+.pet-admin-page {
+  grid-template-columns: 250px minmax(0, 1fr) 340px;
+}
+
+.pet-add-panel {
+  grid-column: auto;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pet-profile-button {
+  border-color: var(--color-card-border);
+  border-radius: 8px;
+}
+
+.pet-detail-grid,
+.pet-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pet-detail-grid input,
+.pet-form-grid input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  border-radius: 8px;
+}
+
+.pet-add-panel .pet-detail-grid,
+.pet-add-panel .pet-form-grid {
+  grid-template-columns: 1fr;
+}
+
+.pet-add-panel .pet-detail-wide,
+.pet-add-panel .pet-form-wide {
+  grid-column: auto;
+}
+
+.pet-add-panel .primary-button.wide {
+  width: 100%;
+  min-height: 44px;
+}
+
+@media (max-width: 1180px) {
+  .history-page,
+  .reminder-page,
+  .reports-page,
+  .pet-admin-page,
+  .chat-page,
+  .safety-hero-card,
+  .safety-current-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-filter-panel,
+  .report-type-panel,
+  .pet-list-panel,
+  .chat-history-panel,
+  .reminder-side {
+    position: static;
+  }
+
+  .reminder-table-head,
+  .reminder-table-row {
+    grid-template-columns: 88px minmax(150px, 1fr) minmax(132px, 0.75fr) 196px;
+  }
+}
+
+@media (max-width: 720px) {
+  .medication-manager-card,
+  .db-match-card,
+  .registration-card,
+  .ocr-result-card,
+  .history-filter-panel,
+  .history-list-card,
+  .reminder-main-card,
+  .reminder-side .card,
+  .safety-hero-card,
+  .safety-workspace,
+  .chat-history-panel,
+  .chat-room-panel,
+  .chat-context-panel .card,
+  .report-type-panel,
+  .report-preview-card,
+  .pet-list-panel,
+  .pet-detail-panel,
+  .pet-add-panel,
+  .family-admin-page .card {
+    padding: 16px;
+  }
+
+  .manual-search,
+  .registration-options,
+  .history-table-head,
+  .history-table-row,
+  .reminder-table-head,
+  .reminder-table-row,
+  .medication-table-head,
+  .medication-table-row,
+  .report-page-toolbar,
+  .report-medication-card dl,
+  .pet-detail-grid,
+  .pet-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .history-table-head,
+  .reminder-table-head,
+  .medication-table-head {
+    display: none;
+  }
+
+  .history-table-row,
+  .reminder-table-row,
+  .medication-table-row {
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .reminder-actions {
+    justify-content: stretch;
+    flex-wrap: wrap;
+  }
+
+  .reminder-actions button {
+    flex: 1 1 96px;
+  }
+
+  .match-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-room-panel {
+    min-height: 520px;
+  }
+
+  .chat-context-panel {
+    display: none;
+  }
+}
+
 @media print {
   .sidebar,
   .topbar,
