@@ -1,12 +1,13 @@
 import type { ReactElement } from "react";
 import { buildSafetyFindings, isPastReviewDate } from "../services/safety";
-import type { CareProfile, FamilyMember, Medication, MedicationSchedule, OcrScan } from "../types";
+import type { CareProfile, FamilyMember, Medication, MedicationLog, MedicationSchedule, OcrScan } from "../types";
 
 interface DashboardPageProps {
   careProfiles: CareProfile[];
   currentProfile: CareProfile;
   familyMembers: FamilyMember[];
   medications: Medication[];
+  logs: MedicationLog[];
   schedules: MedicationSchedule[];
   scans: OcrScan[];
   onNavigateScan: () => void;
@@ -14,12 +15,14 @@ interface DashboardPageProps {
   onNavigateReminders: () => void;
   onNavigateInteractions: () => void;
   onNavigateChat: () => void;
+  onNavigateHistory: () => void;
   onNavigateReports: () => void;
 }
 
 export function DashboardPage({
   careProfiles,
   currentProfile,
+  logs,
   medications,
   schedules,
   scans,
@@ -28,6 +31,7 @@ export function DashboardPage({
   onNavigateReminders,
   onNavigateInteractions,
   onNavigateChat,
+  onNavigateHistory,
   onNavigateReports,
 }: DashboardPageProps): ReactElement {
   const profileMeds = medications.filter((medication) => medication.careProfileId === currentProfile.id);
@@ -48,6 +52,14 @@ export function DashboardPage({
     .slice(0, 6) as Array<{ schedule: MedicationSchedule; medication: Medication; profile: CareProfile }>;
   const familyProfiles = careProfiles.filter((profile) => profile.type !== "pet");
   const petProfiles = careProfiles.filter((profile) => profile.type === "pet");
+  const recentLogs = logs
+    .map((log) => {
+      const medication = medications.find((item) => item.id === log.medicationId);
+      const profile = careProfiles.find((item) => item.id === medication?.careProfileId);
+      return medication && profile ? { log, medication, profile } : undefined;
+    })
+    .filter(Boolean)
+    .slice(0, 5) as Array<{ log: MedicationLog; medication: Medication; profile: CareProfile }>;
 
   return (
     <div className="dashboard-home">
@@ -157,18 +169,28 @@ export function DashboardPage({
           <div className="section-heading row-heading">
             <div>
               <p className="eyebrow">Current</p>
-              <h2>{currentProfile.name} 복용약</h2>
+              <h2>최근 복용 기록</h2>
             </div>
-            <button className="text-button" onClick={onNavigateReports} type="button">전체 보기</button>
+            <button className="text-button" onClick={onNavigateHistory} type="button">전체 보기</button>
           </div>
           <div className="mini-record-list">
-            {profileMeds.slice(0, 5).map((medication) => (
-              <div key={medication.id}>
+            {recentLogs.map(({ log, medication, profile }) => (
+              <div key={log.id}>
                 <span>{medication.productName}</span>
-                <strong>{statusLabel(medication.status)}</strong>
+                <strong>{profile.name}</strong>
               </div>
             ))}
-            {!profileMeds.length && <p className="muted">등록된 복용약이 없습니다.</p>}
+            {!recentLogs.length && (
+              <>
+                {profileMeds.slice(0, 5).map((medication) => (
+                  <div key={medication.id}>
+                    <span>{medication.productName}</span>
+                    <strong>{statusLabel(medication.status)}</strong>
+                  </div>
+                ))}
+                {!profileMeds.length && <p className="muted">등록된 복용약이 없습니다.</p>}
+              </>
+            )}
           </div>
         </article>
 

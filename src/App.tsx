@@ -12,6 +12,7 @@ import {
 import { DashboardPage } from "./pages/DashboardPage";
 import { FamilyAdminPage } from "./pages/FamilyAdminPage";
 import { LoginPage } from "./pages/LoginPage";
+import { MedicationHistoryPage } from "./pages/MedicationHistoryPage";
 import { MedicationScanPage } from "./pages/MedicationScanPage";
 import { PetAdminPage } from "./pages/PetAdminPage";
 import { ProfilesPage } from "./pages/ProfilesPage";
@@ -762,8 +763,10 @@ export function App(): ReactElement {
           careProfiles={displayCareProfiles}
           currentProfile={displayCurrentProfile}
           familyMembers={familyMembers}
+          logs={logs}
           medications={medications}
           onNavigateChat={() => navigate("/chat")}
+          onNavigateHistory={() => navigate("/history")}
           onNavigateInteractions={() => navigate("/interactions")}
           onNavigateProfiles={() => navigate("/profiles")}
           onNavigateReports={() => navigate("/reports")}
@@ -792,6 +795,16 @@ export function App(): ReactElement {
           onDeleteMedication={handleDeleteMedication}
           schedules={effectiveSchedules}
           temporaryMedications={temporaryMedications}
+        />
+      )}
+      {route === "/history" && (
+        <MedicationHistoryPage
+          careProfiles={displayCareProfiles}
+          currentProfile={displayCurrentProfile}
+          logs={logs}
+          medications={medications}
+          onMarkTaken={handleMarkTaken}
+          schedules={effectiveSchedules}
         />
       )}
       {route === "/interactions" && (
@@ -945,6 +958,7 @@ function normalizeRoute(path: string): Route {
       "/",
       "/scan",
       "/profiles",
+      "/history",
       "/reminders",
       "/interactions",
       "/chat",

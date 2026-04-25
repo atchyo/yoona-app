@@ -7,6 +7,7 @@ export type Route =
   | "/"
   | "/scan"
   | "/profiles"
+  | "/history"
   | "/reminders"
   | "/interactions"
   | "/chat"
@@ -20,7 +21,8 @@ export type Route =
 const navItems: Array<{ path: Route; label: string; shortLabel: string; icon: string; ownerOnly?: boolean; adminOnly?: boolean }> = [
   { path: "/", label: "대시보드", shortLabel: "홈", icon: "홈" },
   { path: "/scan", label: "약 관리", shortLabel: "약관리", icon: "약" },
-  { path: "/profiles", label: "복용 기록", shortLabel: "기록", icon: "록" },
+  { path: "/profiles", label: "가족약", shortLabel: "가족약", icon: "가약" },
+  { path: "/history", label: "복용 기록", shortLabel: "기록", icon: "록" },
   { path: "/reminders", label: "복약 알림", shortLabel: "알림", icon: "알" },
   { path: "/interactions", label: "상호작용 체크", shortLabel: "체크", icon: "체" },
   { path: "/chat", label: "AI 건강 상담", shortLabel: "상담", icon: "AI" },
@@ -75,8 +77,8 @@ export function AppShell({
   });
   const preferredMobilePaths: Route[] =
     user.familyRole === "owner" || user.familyRole === "manager"
-      ? ["/", "/scan", "/profiles", "/reminders", "/family"]
-      : ["/", "/scan", "/profiles", "/reminders", "/settings"];
+      ? ["/", "/scan", "/history", "/reminders", "/family"]
+      : ["/", "/scan", "/history", "/reminders", "/settings"];
   const mobileItems = preferredMobilePaths
     .map((path) => visibleItems.find((item) => item.path === path))
     .filter(Boolean) as typeof visibleItems;
@@ -232,7 +234,8 @@ export function AppShell({
 function routeTitle(route: Route, userName: string): string {
   if (route === "/") return `안녕하세요, ${userName}님`;
   if (route === "/scan") return "약 정보를 등록하고 검색해요";
-  if (route === "/profiles") return "가족 복용 기록을 확인해요";
+  if (route === "/profiles") return "가족별 복용약을 확인해요";
+  if (route === "/history") return "복용 완료와 예정 기록을 확인해요";
   if (route === "/reminders") return "복약 시간을 관리해요";
   if (route === "/interactions") return "성분 중복과 주의 조합을 확인해요";
   if (route === "/chat") return "등록 약 기준으로 상담을 준비해요";
@@ -247,7 +250,8 @@ function routeTitle(route: Route, userName: string): string {
 function routeSubtitle(route: Route): string {
   if (route === "/") return "오늘 가족 복용 일정과 주의사항을 한눈에 확인하세요.";
   if (route === "/scan") return "사진 촬영, 파일 첨부, 약명 검색으로 복용약을 등록합니다.";
-  if (route === "/profiles") return "병원 방문 전 복용약과 성분을 빠르게 확인할 수 있습니다.";
+  if (route === "/profiles") return "병원 방문 전 가족별 복용약과 성분을 빠르게 확인할 수 있습니다.";
+  if (route === "/history") return "완료한 복용 기록과 앞으로 예정된 복용 일정을 함께 봅니다.";
   if (route === "/reminders") return "정해진 시간과 장기복용 검토일을 놓치지 않게 관리합니다.";
   if (route === "/interactions") return "확정 약과 영양제 기준으로 성분 중복, 주의 조합, 검토 항목을 봅니다.";
   if (route === "/chat") return "의료 판단이 아니라 성분 중복과 주의사항 확인을 돕습니다.";
