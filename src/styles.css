@@ -1351,6 +1351,21 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.medication-mini-list strong,
+.medication-mini-list small {
+  display: block;
+  min-width: 0;
+}
+
+.medication-mini-list strong {
+  font-weight: 800;
+}
+
+.medication-mini-list small {
+  margin-top: 3px;
+  color: var(--color-muted);
+}
+
 .profile-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1430,12 +1445,28 @@ textarea {
 
 .report-med-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 1.15fr) auto;
   gap: 10px;
+  align-items: start;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background: var(--color-surface);
   padding: 12px;
+}
+
+.report-med-main {
+  min-width: 0;
+}
+
+.report-med-source {
+  display: inline-flex;
+  margin: 0 0 6px;
+  border-radius: var(--radius);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-size: 0.84rem;
+  font-weight: 800;
+  padding: 5px 8px;
 }
 
 .report-delete-button {
@@ -1446,6 +1477,8 @@ textarea {
 .report-med-row strong,
 .report-med-row span {
   display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .report-med-row span {
@@ -3810,6 +3843,87 @@ td select {
   color: var(--color-muted);
 }
 
+.report-medication-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.report-medication-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  padding: 14px;
+}
+
+.report-medication-title {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.report-medication-title span {
+  color: var(--color-primary-strong);
+  font-weight: 800;
+}
+
+.report-medication-title strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 1.03rem;
+}
+
+.report-medication-card dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.report-medication-card dl div {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  padding: 10px;
+}
+
+.report-medication-card dt {
+  margin-bottom: 5px;
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.report-medication-card dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.report-medication-wide {
+  grid-column: 1 / -1;
+}
+
+.service-admin-note {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface-alt);
+  padding: 14px;
+}
+
+.service-admin-note p {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.service-admin-note span {
+  color: var(--color-primary-strong);
+  font-weight: 800;
+}
+
 .pet-admin-page {
   grid-template-columns: minmax(230px, 290px) minmax(0, 1fr);
 }
@@ -3938,6 +4052,10 @@ td select {
   }
 
   .report-table-row {
+    grid-template-columns: 1fr;
+  }
+
+  .report-medication-card dl {
     grid-template-columns: 1fr;
   }
 

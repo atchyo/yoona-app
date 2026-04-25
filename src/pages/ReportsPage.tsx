@@ -2,6 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 import { buildSafetyFindings } from "../services/safety";
 import type { CareProfile, FamilyMember, Medication, MedicationSchedule, TemporaryMedication } from "../types";
+import {
+  ingredientSummary,
+  medicationGuidanceText,
+  medicationPeriodText,
+  medicationScheduleText,
+  medicationStatusLabel,
+  sourceLabel,
+} from "../utils/medicationDisplay";
 
 interface ReportsPageProps {
   careProfiles: CareProfile[];
@@ -137,20 +145,32 @@ export function ReportsPage({
 
             <section>
               <h4>복용약 정보</h4>
-              <div className="report-table">
-                <div className="report-table-head">
-                  <span>약명</span>
-                  <span>성분</span>
-                  <span>복용기간</span>
-                  <span>주기</span>
-                </div>
+              <div className="report-medication-cards">
                 {selectedMedications.map((medication) => (
-                  <div className="report-table-row" key={medication.id}>
-                    <strong>{medication.productName}</strong>
-                    <span>{medication.ingredients.map(formatIngredient).join(", ") || "성분 미등록"}</span>
-                    <span>{periodText(medication)}</span>
-                    <span>{scheduleText(medication, schedules)}</span>
-                  </div>
+                  <article className="report-medication-card" key={medication.id}>
+                    <div className="report-medication-title">
+                      <span>{sourceLabel(medication.source)} · {medicationStatusLabel(medication)}</span>
+                      <strong>{medication.productName}</strong>
+                    </div>
+                    <dl>
+                      <div>
+                        <dt>성분</dt>
+                        <dd>{ingredientSummary(medication.ingredients)}</dd>
+                      </div>
+                      <div>
+                        <dt>복용기간</dt>
+                        <dd>{medicationPeriodText(medication)}</dd>
+                      </div>
+                      <div>
+                        <dt>주기</dt>
+                        <dd>{medicationScheduleText(medication, schedules)}</dd>
+                      </div>
+                      <div className="report-medication-wide">
+                        <dt>복약 지도</dt>
+                        <dd>{medicationGuidanceText(medication)}</dd>
+                      </div>
+                    </dl>
+                  </article>
                 ))}
                 {!selectedMedications.length && (
                   <p className="empty-panel">아직 등록된 복용약이 없습니다.</p>
@@ -188,24 +208,4 @@ function profileRoleLabel(profile: CareProfile, familyMembers: FamilyMember[]): 
   if (member?.role === "owner") return "가족대표";
   if (member?.role === "manager") return "가족관리자";
   return "가족구성원";
-}
-
-function formatIngredient(ingredient: Medication["ingredients"][number]): string {
-  return ingredient.amount ? `${ingredient.name} ${ingredient.amount}` : ingredient.name;
-}
-
-function periodText(medication: Medication): string {
-  const start = medication.startedAt || "시작일 미등록";
-  return medication.reviewAt
-    ? `복용 시작 ${start} · 검토일 ${medication.reviewAt}`
-    : `${start}부터 복용 기록`;
-}
-
-function scheduleText(medication: Medication, schedules: MedicationSchedule[]): string {
-  const medicationSchedules = schedules.filter((schedule) => schedule.medicationId === medication.id);
-  if (medicationSchedules.length) {
-    return medicationSchedules.map((schedule) => `${schedule.timeOfDay} ${schedule.label}`).join(", ");
-  }
-
-  return medication.instructions || medication.dosage || "복용 주기 미등록";
 }

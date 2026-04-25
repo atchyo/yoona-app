@@ -7,6 +7,14 @@ import type {
   MedicationSchedule,
   TemporaryMedication,
 } from "../types";
+import {
+  ingredientSummary,
+  medicationGuidanceText,
+  medicationPeriodText,
+  medicationScheduleText,
+  medicationStatusLabel,
+  sourceLabel,
+} from "../utils/medicationDisplay";
 
 interface ProfilesPageProps {
   careProfiles: CareProfile[];
@@ -97,7 +105,10 @@ function ProfileCard({
         <ul className="medication-mini-list">
           {medications.slice(0, 4).map((medication) => (
             <li key={medication.id}>
-              <span>{medication.productName}</span>
+              <span>
+                <strong>{medication.productName}</strong>
+                <small>{sourceLabel(medication.source)} · {medicationStatusLabel(medication)}</small>
+              </span>
               <button
                 className="text-danger-button"
                 disabled={deletingMedicationId === medication.id}
@@ -192,18 +203,23 @@ function CareReport({
         {medications.length ? (
           medications.map((medication) => (
             <article className="report-med-row" key={medication.id}>
-              <div>
+              <div className="report-med-main">
+                <span className="report-med-source">{sourceLabel(medication.source)} · {medicationStatusLabel(medication)}</span>
                 <strong>{medication.productName}</strong>
-                <span>{medication.ingredients.map(formatIngredient).join(", ") || "성분 미등록"}</span>
+                <span>{ingredientSummary(medication.ingredients)}</span>
               </div>
               <dl>
                 <div>
                   <dt>복용기간</dt>
-                  <dd>{periodText(medication)}</dd>
+                  <dd>{medicationPeriodText(medication)}</dd>
                 </div>
                 <div>
                   <dt>주기</dt>
-                  <dd>{scheduleText(medication, schedules)}</dd>
+                  <dd>{medicationScheduleText(medication, schedules)}</dd>
+                </div>
+                <div>
+                  <dt>지도내용</dt>
+                  <dd>{medicationGuidanceText(medication)}</dd>
                 </div>
               </dl>
               <button className="danger-button report-delete-button" onClick={() => void onDeleteMedication(medication)} type="button">
@@ -258,28 +274,6 @@ function profileSummary(
   }
 
   return profile.notes || "아직 등록된 약 정보가 없습니다.";
-}
-
-function formatIngredient(ingredient: Medication["ingredients"][number]): string {
-  return ingredient.amount ? `${ingredient.name} ${ingredient.amount}` : ingredient.name;
-}
-
-function periodText(medication: Medication): string {
-  const start = medication.startedAt || "시작일 미등록";
-  return medication.reviewAt
-    ? `복용 시작 ${start} · 검토일 ${medication.reviewAt}`
-    : `${start}부터 복용 기록`;
-}
-
-function scheduleText(medication: Medication, schedules: MedicationSchedule[]): string {
-  const medicationSchedules = schedules.filter((schedule) => schedule.medicationId === medication.id);
-  if (medicationSchedules.length) {
-    return medicationSchedules
-      .map((schedule) => `${schedule.timeOfDay} ${schedule.label}`)
-      .join(", ");
-  }
-
-  return medication.instructions || medication.dosage || "복용 주기 미등록";
 }
 
 function petAgeSummary(profile: CareProfile): string {
