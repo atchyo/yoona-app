@@ -1027,6 +1027,7 @@ function displayProfileForUser(
   user: DemoUser | null,
   familyMembers: FamilyMember[],
 ): CareProfile {
+  const isPlaceholderName = ["나", "본인", "가족 구성원"].includes(profile.name.trim());
   const linkedMember = familyMembers.find(
     (member) => member.userId === profile.ownerUserId || member.careProfileId === profile.id,
   );
@@ -1035,7 +1036,12 @@ function displayProfileForUser(
     return { ...profile, name: linkedMember.displayName };
   }
 
-  if (user?.name && profile.type !== "pet" && (!profile.ownerUserId || profile.ownerUserId === user.id)) {
+  if (
+    user?.name &&
+    profile.type !== "pet" &&
+    isPlaceholderName &&
+    (!profile.ownerUserId || profile.ownerUserId === user.id)
+  ) {
     return { ...profile, name: user.name };
   }
 

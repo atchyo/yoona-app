@@ -35,7 +35,7 @@ const navItems: Array<{ path: Route; label: string; shortLabel: string; icon: Ic
   { path: "/service-admin", label: "서비스 관리", shortLabel: "관리", icon: "clipboard", adminOnly: true },
 ];
 
-const appIconSrc = `${import.meta.env.BASE_URL}opti_me_app_icon.svg`;
+const appIconSrc = `${import.meta.env.BASE_URL}opti_me_app_icon.svg?v=20260425-6`;
 
 interface AppShellProps {
   availableProfiles: CareProfile[];

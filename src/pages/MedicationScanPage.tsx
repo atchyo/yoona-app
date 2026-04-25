@@ -23,6 +23,7 @@ interface MedicationScanPageProps {
 }
 
 const MATCH_PAGE_SIZE = 8;
+const MATCH_RESULT_LIMIT = 50;
 
 export function MedicationScanPage({
   careProfiles,
@@ -605,6 +606,9 @@ export function MedicationScanPage({
             <strong>검색 후보 {filteredMatches.length}개</strong>
             {filteredMatches.length > visibleMatches.length && (
               <span className="match-count-copy">현재 {visibleMatches.length}개 표시 중</span>
+            )}
+            {matches.length >= MATCH_RESULT_LIMIT && (
+              <span className="match-count-copy">관련도 높은 후보를 최대 {MATCH_RESULT_LIMIT}개까지 불러왔습니다.</span>
             )}
           </div>
           <div className="source-filter-list">
