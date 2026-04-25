@@ -5,6 +5,8 @@ import { signInWithProvider } from "../services/supabaseClient";
 import { ThemeToggle } from "../components/ThemeToggle";
 import type { ThemeMode } from "../types";
 
+const loginIllustrationSrc = `${import.meta.env.BASE_URL}family-care-illustration.png?v=20260425-1`;
+
 interface LoginPageProps {
   onThemeToggle: () => void;
   theme: ThemeMode;
@@ -49,7 +51,7 @@ export function LoginPage({
         <img
           alt="영양제와 건강 루틴을 확인하는 모습"
           className="login-image"
-          src="https://images.unsplash.com/photo-1687200267991-d86b8df69968?auto=format&fit=crop&w=1200&q=80"
+          src={loginIllustrationSrc}
         />
       </section>
       <section className="login-card" aria-labelledby="login-title">

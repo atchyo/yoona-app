@@ -6,6 +6,8 @@ import { deflateSync, inflateSync } from "node:zlib";
 const publicDir = join(process.cwd(), "public");
 const sourceSvgPath = join(publicDir, "opti_me_app_icon.svg");
 const sourcePngPath = join(publicDir, "opti_me_app_icon.png");
+const originalIconPath = join(publicDir, "opti_me_top_left_icon.png");
+const croppedOriginalPath = join(publicDir, ".opti_me_app_icon_crop.png");
 const flattenedJpegPath = join(publicDir, ".opti_me_app_icon_flat.jpg");
 const CRC_TABLE = Array.from({ length: 256 }, (_, index) => {
   let value = index;
@@ -59,6 +61,15 @@ execFileSync("sips", ["-s", "format", "png", sourceSvgPath, "--out", sourcePngPa
 execFileSync("sips", ["-s", "format", "jpeg", sourcePngPath, "--out", flattenedJpegPath], { stdio: "ignore" });
 execFileSync("sips", ["-s", "format", "png", flattenedJpegPath, "--out", sourcePngPath], { stdio: "ignore" });
 
+if (existsSync(originalIconPath)) {
+  execFileSync("sips", ["-c", "370", "370", "--cropOffset", "58", "78", originalIconPath, "--out", croppedOriginalPath], {
+    stdio: "ignore",
+  });
+  execFileSync("sips", ["-z", "512", "512", croppedOriginalPath, "--out", sourcePngPath], {
+    stdio: "ignore",
+  });
+}
+
 for (const [fileName, size] of [
   ["apple-touch-icon.png", 180],
   ["icon-192.png", 192],
@@ -76,6 +87,10 @@ for (const fileName of ["opti_me_app_icon.png", "apple-touch-icon.png", "icon-19
 
 if (existsSync(flattenedJpegPath)) {
   rmSync(flattenedJpegPath);
+}
+
+if (existsSync(croppedOriginalPath)) {
+  rmSync(croppedOriginalPath);
 }
 
 if (existsSync(join(publicDir, "favicon.ico"))) {

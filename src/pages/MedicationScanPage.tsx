@@ -48,6 +48,7 @@ export function MedicationScanPage({
   const [registrationInstructions, setRegistrationInstructions] = useState("");
   const [registrationReviewAt, setRegistrationReviewAt] = useState("");
   const [activeRegistrationMode, setActiveRegistrationMode] = useState<"search" | "photo">("search");
+  const [medicationFilter, setMedicationFilter] = useState<"all" | "active" | "review">("all");
   const [sourceFilter, setSourceFilter] = useState<DrugSource | "all">("all");
   const [matchDisplayCount, setMatchDisplayCount] = useState(MATCH_PAGE_SIZE);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -111,6 +112,11 @@ export function MedicationScanPage({
   const selectedProfileMedications = medications.filter(
     (medication) => medication.careProfileId === selectedProfile.id,
   );
+  const filteredProfileMedications = selectedProfileMedications.filter((medication) => {
+    if (medicationFilter === "active") return medication.status === "confirmed";
+    if (medicationFilter === "review") return medication.status !== "confirmed";
+    return true;
+  });
   const registeredMedicationKeys = new Set(
     selectedProfileMedications.map((medication) => medicationKey(medication.source, medication.productName)),
   );
@@ -377,21 +383,63 @@ export function MedicationScanPage({
         <div className="section-heading split-heading">
           <div>
             <p className="eyebrow">등록 약 관리</p>
-            <h2>{selectedProfile.name}님의 등록 약</h2>
-            <p className="muted">현재 선택한 가족의 약·영양제 기록을 확인하고 필요 없는 항목은 바로 정리합니다.</p>
+            <h2>약 관리</h2>
+            <p className="muted">{selectedProfile.name}님의 약과 영양제를 한곳에서 관리할 수 있습니다.</p>
           </div>
-          <span className="profile-active-badge">등록 {selectedProfileMedications.length}건</span>
+          <button className="primary-button add-medication-button" onClick={() => setActiveRegistrationMode("search")} type="button">
+            + 약 등록
+          </button>
         </div>
-        {selectedProfileMedications.length ? (
+        <div className="manager-toolbar">
+          <div className="manager-tabs" role="tablist" aria-label="등록 약 필터">
+            <button
+              aria-selected={medicationFilter === "all"}
+              className={medicationFilter === "all" ? "active" : ""}
+              onClick={() => setMedicationFilter("all")}
+              role="tab"
+              type="button"
+            >
+              전체
+            </button>
+            <button
+              aria-selected={medicationFilter === "active"}
+              className={medicationFilter === "active" ? "active" : ""}
+              onClick={() => setMedicationFilter("active")}
+              role="tab"
+              type="button"
+            >
+              복용 중
+            </button>
+            <button
+              aria-selected={medicationFilter === "review"}
+              className={medicationFilter === "review" ? "active" : ""}
+              onClick={() => setMedicationFilter("review")}
+              role="tab"
+              type="button"
+            >
+              검토
+            </button>
+          </div>
+          <span className="profile-active-badge">등록 {filteredProfileMedications.length}건</span>
+        </div>
+        {filteredProfileMedications.length ? (
           <div className="medication-table-list">
-            {selectedProfileMedications.map((medication) => (
+            <div className="medication-table-head" aria-hidden="true">
+              <span>약 정보</span>
+              <span>복용 대상</span>
+              <span>복용 방법</span>
+              <span>등록 상태</span>
+              <span>관리</span>
+            </div>
+            {filteredProfileMedications.map((medication) => (
               <article className="medication-table-row" key={medication.id}>
                 <div>
                   <strong>{medication.productName}</strong>
                   <span>{ingredientSummary(medication.ingredients)}</span>
                 </div>
-                <span>{sourceLabel(medication.source)}</span>
+                <span>{selectedProfile.name}</span>
                 <span>{medication.instructions || medication.dosage || "복용 정보 미등록"}</span>
+                <span className="status-pill done">{sourceLabel(medication.source)}</span>
                 <button
                   className="danger-button table-action"
                   disabled={deletingMedicationId === medication.id}

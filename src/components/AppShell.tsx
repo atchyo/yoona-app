@@ -35,7 +35,8 @@ const navItems: Array<{ path: Route; label: string; shortLabel: string; icon: Ic
   { path: "/service-admin", label: "서비스 관리", shortLabel: "관리", icon: "clipboard", adminOnly: true },
 ];
 
-const appIconSrc = `${import.meta.env.BASE_URL}opti_me_app_icon.png?v=20260425-7`;
+const brandMarkSrc = `${import.meta.env.BASE_URL}opti_me_family_mark.png?v=20260425-1`;
+const sidebarIllustrationSrc = `${import.meta.env.BASE_URL}family-care-illustration.png?v=20260425-1`;
 
 interface AppShellProps {
   availableProfiles: CareProfile[];
@@ -79,8 +80,8 @@ export function AppShell({
   });
   const preferredMobilePaths: Route[] =
     user.familyRole === "owner" || user.familyRole === "manager"
-      ? ["/", "/scan", "/history", "/reminders", "/family"]
-      : ["/", "/scan", "/history", "/reminders", "/settings"];
+      ? ["/", "/scan", "/reminders", "/chat", "/family"]
+      : ["/", "/scan", "/reminders", "/chat", "/settings"];
   const mobileItems = preferredMobilePaths
     .map((path) => visibleItems.find((item) => item.path === path))
     .filter(Boolean) as typeof visibleItems;
@@ -90,7 +91,7 @@ export function AppShell({
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand-block">
-          <img alt="Opti-Me" className="app-icon brand-icon" src={appIconSrc} />
+          <img alt="Opti-Me" className="app-icon brand-icon" src={brandMarkSrc} />
           <div>
             <strong>Opti-Me</strong>
             <span>가족 약 관리</span>
@@ -111,6 +112,7 @@ export function AppShell({
           ))}
         </nav>
         <div className="sidebar-card">
+          <img alt="" className="sidebar-illustration" src={sidebarIllustrationSrc} />
           <span className="sidebar-card-label">{workspaceKindLabel(workspace, familyMembers, user)}</span>
           <strong>우리 가족의 건강을 한눈에, 스마트하게</strong>
           <p>약과 영양제, 반려동물 기록까지 안전하고 체계적으로 관리하세요.</p>
@@ -180,9 +182,9 @@ export function AppShell({
                 onClick={() => setIsProfileMenuOpen((current) => !current)}
                 type="button"
               >
-                <span>{profileRoleLabel(currentProfile, familyMembers, user)}</span>
+                <span className="topbar-avatar" aria-hidden="true">{profileAvatar(currentProfile)}</span>
                 <div className="profile-switcher-copy">
-                  <small>관리대상</small>
+                  <small>{profileRoleLabel(currentProfile, familyMembers, user)}</small>
                   <strong>{currentProfile.name}</strong>
                 </div>
               </button>
@@ -279,18 +281,18 @@ function WorkspaceContextBanner({
 }
 
 function routeTitle(route: Route, userName: string): string {
-  if (route === "/") return `안녕하세요, ${userName}님`;
-  if (route === "/scan") return "약 정보를 등록하고 검색해요";
-  if (route === "/profiles") return "가족별 복용약을 확인해요";
-  if (route === "/history") return "복용 완료와 예정 기록을 확인해요";
-  if (route === "/reminders") return "복약 시간을 관리해요";
-  if (route === "/interactions") return "성분 중복과 주의 조합을 확인해요";
-  if (route === "/chat") return "등록 약 기준으로 상담을 준비해요";
-  if (route === "/reports") return "병원 방문용 복약 리포트를 만들어요";
-  if (route === "/family") return "가족과 반려동물 권한을 관리해요";
-  if (route === "/pets") return "반려동물 건강 기록을 관리해요";
-  if (route === "/settings") return "계정과 화면 설정을 확인해요";
-  if (route === "/service-admin") return "서비스 데이터를 관리해요";
+  if (route === "/") return `안녕하세요, ${userName}님!`;
+  if (route === "/scan") return "약 관리";
+  if (route === "/profiles") return "가족약";
+  if (route === "/history") return "복용 기록";
+  if (route === "/reminders") return "복약 알림";
+  if (route === "/interactions") return "상호작용 체크";
+  if (route === "/chat") return "AI 건강 상담";
+  if (route === "/reports") return "리포트 출력";
+  if (route === "/family") return "가족 관리";
+  if (route === "/pets") return "반려동물 관리";
+  if (route === "/settings") return "설정";
+  if (route === "/service-admin") return "서비스 관리";
   return "Opti-Me";
 }
 
@@ -322,6 +324,12 @@ function profileRoleLabel(
   if (member?.role === "owner") return "대표";
   if (member?.role === "manager") return "관리";
   return "가족";
+}
+
+function profileAvatar(profile: CareProfile): string {
+  if (profile.type === "pet") return "🐶";
+  const lastDigit = profile.id.charCodeAt(profile.id.length - 1) % 4;
+  return ["👨", "👩", "👦", "👧"][lastDigit] || "🙂";
 }
 
 function workspaceKindLabel(

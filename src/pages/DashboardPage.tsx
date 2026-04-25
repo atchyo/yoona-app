@@ -64,12 +64,17 @@ export function DashboardPage({
     })
     .filter(Boolean)
     .slice(0, 5) as Array<{ log: MedicationLog; medication: Medication; profile: CareProfile }>;
+  const todayLabel = new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  }).format(new Date());
 
   return (
     <div className="dashboard-home">
       <section className="summary-grid">
         <SummaryCard icon="pill" label="복용 중인 약" value={`${medications.length}개`} action="전체 보기" onClick={onNavigateProfiles} />
-        <SummaryCard icon="bell" label="오늘 복용 예정" value={`${todaySchedules.length}개`} action="일정 보기" onClick={onNavigateReminders} />
+        <SummaryCard icon="bell" label="오늘 복용 예정" value={`${todaySchedules.length}개`} action="상세 보기" onClick={onNavigateReminders} />
         <SummaryCard icon="shield" label="주의 상호작용" value={`${findings.length}건`} action="확인하기" tone="danger" onClick={onNavigateInteractions} />
         <SummaryCard icon="file" label="이번 주 리포트" value={`${Math.max(1, familyProfiles.length)}개`} action="출력하기" onClick={onNavigateReports} />
       </section>
@@ -81,6 +86,7 @@ export function DashboardPage({
               <p className="eyebrow">Today</p>
               <h2>오늘의 복용 일정</h2>
             </div>
+            <span className="today-date-label">{todayLabel}</span>
             <button className="text-button" onClick={onNavigateReminders} type="button">전체 일정 보기</button>
           </div>
           <div className="schedule-list">
@@ -88,7 +94,7 @@ export function DashboardPage({
               todaySchedules.map(({ schedule, medication, profile }) => (
                 <div className="schedule-row" key={schedule.id}>
                   <time>{schedule.timeOfDay}</time>
-                  <div className="medicine-icon" aria-hidden="true">{medicineInitial(medication.productName)}</div>
+                  <div className="medicine-icon" aria-hidden="true">{medicineIcon(medication.productName)}</div>
                   <div>
                     <strong>{medication.productName}</strong>
                     <span>{schedule.label} · {medication.dosage || "등록 용량 확인"}</span>
@@ -103,10 +109,9 @@ export function DashboardPage({
               <p className="muted">오늘 등록된 복용 일정이 없습니다.</p>
             )}
           </div>
-          <div className="quick-action-row">
-            <button className="primary-button" onClick={onNavigateScan} type="button">약 등록</button>
-            <button className="ghost-button" onClick={onNavigateScan} type="button">약명 검색</button>
-          </div>
+          <button className="ghost-button wide reminder-config-button" onClick={onNavigateReminders} type="button">
+            복약 알림 설정
+          </button>
         </article>
 
         <article className="card interaction-card">
@@ -139,7 +144,7 @@ export function DashboardPage({
           <div className="avatar-row">
             {familyProfiles.slice(0, 5).map((profile) => (
               <div className="avatar-person" key={profile.id}>
-                <span>{profile.name.slice(0, 1)}</span>
+                <span>{profileAvatar(profile)}</span>
                 <strong>{profile.name}</strong>
               </div>
             ))}
@@ -158,7 +163,7 @@ export function DashboardPage({
           {petProfiles.length ? (
             petProfiles.map((profile) => (
               <div className="pet-row" key={profile.id}>
-                <span className="pet-face" aria-hidden="true">P</span>
+                <span className="pet-face" aria-hidden="true">🐶</span>
                 <div>
                   <strong>{profile.name}</strong>
                   <p>{profile.petDetails?.age || profile.notes || "건강 기록 관리 중"}</p>
@@ -271,6 +276,15 @@ function statusLabel(status: Medication["status"]): string {
   return "검토필요";
 }
 
-function medicineInitial(name: string): string {
-  return name.trim().slice(0, 1) || "M";
+function medicineIcon(name: string): string {
+  if (/비타민|vitamin/i.test(name)) return "🧃";
+  if (/오메가|omega/i.test(name)) return "💊";
+  if (/마그네슘|mag/i.test(name)) return "⚕";
+  return "💊";
+}
+
+function profileAvatar(profile: CareProfile): string {
+  if (profile.type === "pet") return "🐶";
+  const seed = profile.name.charCodeAt(0) % 4;
+  return ["👨", "👩", "👦", "👧"][seed] || "🙂";
 }
