@@ -219,7 +219,7 @@ export function DashboardPage({
               <p className="eyebrow">Reports</p>
               <h2>복약 지도 리포트</h2>
             </div>
-            <button className="text-button" onClick={onNavigateProfiles} type="button">전체 보기</button>
+            <button className="text-button" onClick={onNavigateReports} type="button">전체 보기</button>
           </div>
           <div className="mini-record-list">
             {familyProfiles.slice(0, 3).map((profile) => (

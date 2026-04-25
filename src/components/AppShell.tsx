@@ -35,7 +35,7 @@ const navItems: Array<{ path: Route; label: string; shortLabel: string; icon: Ic
   { path: "/service-admin", label: "서비스 관리", shortLabel: "관리", icon: "clipboard", adminOnly: true },
 ];
 
-const appIconSrc = `${import.meta.env.BASE_URL}opti_me_app_icon.svg?v=20260425-6`;
+const appIconSrc = `${import.meta.env.BASE_URL}opti_me_app_icon.png?v=20260425-7`;
 
 interface AppShellProps {
   availableProfiles: CareProfile[];
@@ -112,8 +112,8 @@ export function AppShell({
         </nav>
         <div className="sidebar-card">
           <span className="sidebar-card-label">{workspaceKindLabel(workspace, familyMembers, user)}</span>
-          <strong>{workspace.name}</strong>
-          <p>개인공간과 가족공간은 따로 저장됩니다. 상단 공간 전환으로 범위를 바꾸고, 관리대상에서 볼 사람을 선택합니다.</p>
+          <strong>우리 가족의 건강을 한눈에, 스마트하게</strong>
+          <p>약과 영양제, 반려동물 기록까지 안전하고 체계적으로 관리하세요.</p>
         </div>
       </aside>
 

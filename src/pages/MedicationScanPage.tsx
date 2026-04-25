@@ -22,7 +22,7 @@ interface MedicationScanPageProps {
   onCreateTemporaryMedication: (medication: TemporaryMedication, scan: OcrScan) => Promise<void> | void;
 }
 
-const MATCH_PAGE_SIZE = 8;
+const MATCH_PAGE_SIZE = 10;
 const MATCH_RESULT_LIMIT = 50;
 
 export function MedicationScanPage({
@@ -540,7 +540,7 @@ export function MedicationScanPage({
           <p className="eyebrow">공식 약DB</p>
           <h2>공식 DB 후보 확인</h2>
           <p className="muted">
-            실제 공식 데이터베이스 검색 결과만 표시합니다. 관련도 높은 후보를 8개씩 나누어 보여주고,
+            실제 공식 데이터베이스 검색 결과만 표시합니다. 관련도 높은 후보를 10개씩 나누어 보여주고,
             후보가 없으면 수기 입력 후 임시약으로 저장해 주세요.
           </p>
         </div>
@@ -560,7 +560,10 @@ export function MedicationScanPage({
               <button
                 aria-label="검색어 지우기"
                 className="search-clear-button"
-                onClick={() => setManualName("")}
+                onClick={() => {
+                  resetSearchArtifacts();
+                  setProgress("");
+                }}
                 type="button"
               >
                 ×
