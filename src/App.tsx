@@ -772,6 +772,7 @@ export function App(): ReactElement {
           onNavigateReports={() => navigate("/reports")}
           onNavigateReminders={() => navigate("/reminders")}
           onNavigateScan={() => navigate("/scan")}
+          onMarkTaken={handleMarkTaken}
           scans={scans}
           schedules={effectiveSchedules}
         />

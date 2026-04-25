@@ -1,4 +1,6 @@
 import type { ReactElement } from "react";
+import { Icon } from "../components/Icon";
+import type { IconName } from "../components/Icon";
 import { buildSafetyFindings, isPastReviewDate } from "../services/safety";
 import type { CareProfile, FamilyMember, Medication, MedicationLog, MedicationSchedule, OcrScan } from "../types";
 
@@ -17,6 +19,7 @@ interface DashboardPageProps {
   onNavigateChat: () => void;
   onNavigateHistory: () => void;
   onNavigateReports: () => void;
+  onMarkTaken: (schedule: MedicationSchedule) => Promise<void> | void;
 }
 
 export function DashboardPage({
@@ -33,6 +36,7 @@ export function DashboardPage({
   onNavigateChat,
   onNavigateHistory,
   onNavigateReports,
+  onMarkTaken,
 }: DashboardPageProps): ReactElement {
   const profileMeds = medications.filter((medication) => medication.careProfileId === currentProfile.id);
   const findings = careProfiles.flatMap((profile) =>
@@ -64,10 +68,10 @@ export function DashboardPage({
   return (
     <div className="dashboard-home">
       <section className="summary-grid">
-        <SummaryCard label="복용 중인 약" value={`${medications.length}개`} action="전체 보기" onClick={onNavigateProfiles} />
-        <SummaryCard label="오늘 복용 예정" value={`${todaySchedules.length}개`} action="일정 보기" onClick={onNavigateReminders} />
-        <SummaryCard label="주의 상호작용" value={`${findings.length}건`} action="확인하기" tone="danger" onClick={onNavigateInteractions} />
-        <SummaryCard label="이번 주 리포트" value={`${Math.max(1, familyProfiles.length)}개`} action="출력하기" onClick={onNavigateReports} />
+        <SummaryCard icon="pill" label="복용 중인 약" value={`${medications.length}개`} action="전체 보기" onClick={onNavigateProfiles} />
+        <SummaryCard icon="bell" label="오늘 복용 예정" value={`${todaySchedules.length}개`} action="일정 보기" onClick={onNavigateReminders} />
+        <SummaryCard icon="shield" label="주의 상호작용" value={`${findings.length}건`} action="확인하기" tone="danger" onClick={onNavigateInteractions} />
+        <SummaryCard icon="file" label="이번 주 리포트" value={`${Math.max(1, familyProfiles.length)}개`} action="출력하기" onClick={onNavigateReports} />
       </section>
 
       <section className="dashboard-main-grid">
@@ -89,7 +93,10 @@ export function DashboardPage({
                     <strong>{medication.productName}</strong>
                     <span>{schedule.label} · {medication.dosage || "등록 용량 확인"}</span>
                   </div>
-                  <span className="owner-badge">{profile.name}</span>
+                  <button className="owner-badge schedule-done-button" onClick={() => void onMarkTaken(schedule)} type="button">
+                    복용 완료
+                  </button>
+                  <span className="owner-badge schedule-owner-badge">{profile.name}</span>
                 </div>
               ))
             ) : (
@@ -97,7 +104,7 @@ export function DashboardPage({
             )}
           </div>
           <div className="quick-action-row">
-            <button className="primary-button" onClick={onNavigateScan} type="button">약 사진 등록</button>
+            <button className="primary-button" onClick={onNavigateScan} type="button">약 등록</button>
             <button className="ghost-button" onClick={onNavigateScan} type="button">약명 검색</button>
           </div>
         </article>
@@ -237,9 +244,11 @@ function SummaryCard({
   label,
   value,
   action,
+  icon,
   tone,
   onClick,
 }: {
+  icon: IconName;
   label: string;
   value: string;
   action: string;
@@ -248,7 +257,7 @@ function SummaryCard({
 }): ReactElement {
   return (
     <button className={tone === "danger" ? "summary-card danger-summary" : "summary-card"} onClick={onClick} type="button">
-      <span className="summary-icon" aria-hidden="true">{label.slice(0, 1)}</span>
+      <span className="summary-icon" aria-hidden="true"><Icon name={icon} /></span>
       <span>{label}</span>
       <strong>{value}</strong>
       <small>{action}</small>
