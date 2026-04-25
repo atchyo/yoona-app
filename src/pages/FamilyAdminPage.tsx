@@ -376,7 +376,8 @@ export function FamilyAdminPage({
             <p className="eyebrow">초대와 권한</p>
             <h2>가족 구성원 관리</h2>
             <p className="muted">
-              초대 즉시 관리대상이 만들어지고, 상대가 수락하면 같은 가족공간 계정으로 연결됩니다.
+              초대 즉시 관리대상이 만들어지고, 상대가 직접 수락해야 가족공간 계정으로 연결됩니다.
+              상대의 개인공간 기록은 그대로 유지되고, 복사 여부는 수락할 때 선택합니다.
             </p>
           </div>
           <button
@@ -435,6 +436,7 @@ export function FamilyAdminPage({
                   <div>
                     <strong>{invitation.displayName}</strong>
                     <span>{invitation.email}</span>
+                    <small>상대가 수락하기 전까지 개인공간과 분리됩니다.</small>
                   </div>
                   <div>
                     <span>{roleLabel(invitation.role)}</span>

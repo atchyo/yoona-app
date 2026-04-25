@@ -1635,6 +1635,14 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.pending-invite-card small {
+  display: block;
+  margin-top: 5px;
+  color: var(--color-primary-strong);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .pending-invite-card > div:last-child {
   display: flex;
   align-items: center;

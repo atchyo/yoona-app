@@ -113,7 +113,7 @@ export function AppShell({
         <div className="sidebar-card">
           <span className="sidebar-card-label">{workspaceKindLabel(workspace, familyMembers, user)}</span>
           <strong>{workspace.name}</strong>
-          <p>공간은 데이터가 저장되는 가족 단위입니다. 우측 상단 관리대상에서 누구의 약 기록을 볼지 바꿀 수 있습니다.</p>
+          <p>개인공간과 가족공간은 따로 저장됩니다. 상단 공간 전환으로 범위를 바꾸고, 관리대상에서 볼 사람을 선택합니다.</p>
         </div>
       </aside>
 
@@ -160,7 +160,7 @@ export function AppShell({
                       <strong>{item.name}</strong>
                       <span>
                         {item.id === workspace.id
-                          ? "현재 건강공간"
+                          ? "현재 선택됨"
                           : workspaceKindLabel(item, familyMembers, user)}
                       </span>
                     </button>
@@ -287,7 +287,7 @@ function workspaceKindLabel(
 ): string {
   const connectedMembers = familyMembers.filter((member) => member.workspaceId === workspace.id);
 
-  if (workspace.ownerUserId !== user.id) return "초대받은 가족공간";
-  if (connectedMembers.some((member) => member.userId && member.userId !== user.id)) return "내 가족공간";
-  return "내 건강공간";
+  if (workspace.ownerUserId !== user.id) return "초대 가족공간";
+  if (connectedMembers.some((member) => member.userId && member.userId !== user.id)) return "가족공간";
+  return "개인공간";
 }
