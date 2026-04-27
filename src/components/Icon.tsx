@@ -5,7 +5,10 @@ export type IconName =
   | "calendar"
   | "chat"
   | "check"
+  | "chevronRight"
   | "clipboard"
+  | "clock"
+  | "download"
   | "family"
   | "file"
   | "home"
@@ -14,9 +17,12 @@ export type IconName =
   | "pill"
   | "plus"
   | "scan"
+  | "send"
   | "settings"
   | "shield"
-  | "sun";
+  | "sun"
+  | "user"
+  | "warning";
 
 export function Icon({ name }: { name: IconName }): ReactElement {
   return (
@@ -31,7 +37,7 @@ function iconPath(name: IconName): ReactElement {
     stroke: "currentColor",
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
-    strokeWidth: 1.9,
+    strokeWidth: 1.8,
   };
 
   switch (name) {
@@ -58,11 +64,28 @@ function iconPath(name: IconName): ReactElement {
       );
     case "check":
       return <path d="m5 12.4 4.2 4.2L19 6.8" {...common} />;
+    case "chevronRight":
+      return <path d="m9 5 6.7 7L9 19" {...common} />;
     case "clipboard":
       return (
         <>
           <path d="M9 4h6l1 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l1-2Z" {...common} />
           <path d="M9 6h6M8 11h8M8 15h5" {...common} />
+        </>
+      );
+    case "clock":
+      return (
+        <>
+          <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" {...common} />
+          <path d="M12 7.5v5l3.4 2" {...common} />
+        </>
+      );
+    case "download":
+      return (
+        <>
+          <path d="M12 4v9.5" {...common} />
+          <path d="m8.2 10.2 3.8 3.8 3.8-3.8" {...common} />
+          <path d="M5 18.5h14" {...common} />
         </>
       );
     case "family":
@@ -111,6 +134,13 @@ function iconPath(name: IconName): ReactElement {
           <path d="M9 9h6M9 15h4" {...common} />
         </>
       );
+    case "send":
+      return (
+        <>
+          <path d="m4 11.8 15.8-7.3-4.8 15-3.4-6.1-7.6-1.6Z" {...common} />
+          <path d="m11.6 13.4 3.8-4.7" {...common} />
+        </>
+      );
     case "settings":
       return (
         <>
@@ -130,6 +160,20 @@ function iconPath(name: IconName): ReactElement {
         <>
           <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" {...common} />
           <path d="M12 2.5v2M12 19.5v2M4.8 4.8l1.4 1.4M17.8 17.8l1.4 1.4M2.5 12h2M19.5 12h2M4.8 19.2l1.4-1.4M17.8 6.2l1.4-1.4" {...common} />
+        </>
+      );
+    case "user":
+      return (
+        <>
+          <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" {...common} />
+          <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0" {...common} />
+        </>
+      );
+    case "warning":
+      return (
+        <>
+          <path d="M10.4 4.6 3.2 17.1a2.1 2.1 0 0 0 1.8 3.1h14a2.1 2.1 0 0 0 1.8-3.1L13.6 4.6a1.85 1.85 0 0 0-3.2 0Z" {...common} />
+          <path d="M12 9v4.2M12 16.8h.01" {...common} />
         </>
       );
   }

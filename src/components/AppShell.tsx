@@ -101,10 +101,15 @@ export function AppShell({
     .map((path) => visibleItems.find((item) => item.path === path))
     .filter(Boolean) as typeof visibleItems;
   return (
-    <div className="app-shell">
+    <div className={route === "/" ? "app-shell dashboard-v2-shell" : "app-shell"}>
       <aside className="sidebar">
         <div className="brand-block">
-          <BrandMark className="brand-icon" />
+          <img
+            alt=""
+            aria-hidden="true"
+            className="brand-icon brand-icon-image"
+            src={`${import.meta.env.BASE_URL}assets/opti-me-icon.png`}
+          />
           <div>
             <strong>Opti-Me</strong>
             <span>가족 약 관리</span>
@@ -150,7 +155,7 @@ export function AppShell({
             )}
             {route === "/" && <BrandMark className="mobile-brand-icon" />}
             <div>
-              <h1>{routeTitle(route, currentProfile.name)}</h1>
+              <h1>{routeTitle(route, route === "/" ? user.name : currentProfile.name)}</h1>
               <p>{mobileRouteSubtitle(route)}</p>
             </div>
           </div>
@@ -164,7 +169,7 @@ export function AppShell({
         </header>
         <header className="topbar">
           <div className="topbar-title">
-            <h1>{greetingTitle(currentProfile.name)}</h1>
+            <h1>{greetingTitle(user.name)}</h1>
             <p>{routeSubtitle("/")}</p>
           </div>
           <div className="topbar-actions">
@@ -235,7 +240,7 @@ export function AppShell({
                 </span>
                 <div className="profile-switcher-copy">
                   <small>{profileRoleLabel(currentProfile, familyMembers, user)}</small>
-                  <strong>{currentProfile.name}</strong>
+                  <strong>{user.name}</strong>
                 </div>
               </button>
               {isProfileMenuOpen && (
@@ -340,7 +345,7 @@ function WorkspaceContextBanner({
 }
 
 function routeTitle(route: Route, userName: string): string {
-  if (route === "/") return `안녕하세요, ${userName}님!`;
+  if (route === "/") return `안녕하세요. ${userName}님!`;
   if (route === "/scan") return "약 관리";
   if (route === "/profiles") return "가족약";
   if (route === "/history") return "복용 기록";
@@ -356,7 +361,7 @@ function routeTitle(route: Route, userName: string): string {
 }
 
 function greetingTitle(userName: string): string {
-  return `안녕하세요, ${userName}님!`;
+  return `안녕하세요. ${userName}님!`;
 }
 
 function mobileTabLabel(path: Route, fallback: string): string {

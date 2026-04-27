@@ -1,0 +1,1514 @@
+[
+  {
+    "label": "4k",
+    "file": "screenshots/dashboard-v2-desktop-4k.png",
+    "screenshotSize": {
+      "width": 3840,
+      "height": 2160
+    },
+    "metrics": {
+      "innerWidth": 1920,
+      "innerHeight": 1080,
+      "devicePixelRatio": 2,
+      "path": "/",
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "logo": {
+        "x": 24,
+        "y": 34,
+        "width": 40,
+        "height": 40,
+        "bottom": 74,
+        "color": "rgb(71, 85, 105)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(135deg, rgb(255, 159, 10), rgb(255, 122, 0))",
+        "fontWeight": "650",
+        "objectFit": "cover"
+      },
+      "promoCard": {
+        "x": 18,
+        "y": 704,
+        "width": 187,
+        "height": 232,
+        "bottom": 936,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(251, 253, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "promoImage": {
+        "x": 33,
+        "y": 718,
+        "width": 157,
+        "height": 88,
+        "bottom": 806,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(244, 247, 252)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "contain"
+      },
+      "lastNavBottom": 584,
+      "lowerGrid": {
+        "x": 258,
+        "y": 784,
+        "width": 1530,
+        "height": 254,
+        "bottom": 1038,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "profileAvatar": {
+        "x": 1590,
+        "y": 53,
+        "width": 30,
+        "height": 30,
+        "bottom": 83,
+        "color": "rgb(100, 116, 139)",
+        "background": "rgb(248, 251, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "800",
+        "objectFit": "fill"
+      },
+      "profileBefore": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "profileAfter": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "familyFirstIcon": {
+        "x": 1211,
+        "y": 556,
+        "width": 25,
+        "height": 25,
+        "bottom": 581,
+        "color": "rgb(83, 98, 122)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "500",
+        "objectFit": "fill"
+      },
+      "dogContainment": [
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        },
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        }
+      ],
+      "reportIconCenter": {
+        "dx": 0,
+        "dy": 0.75,
+        "outer": {
+          "width": 26,
+          "height": 26
+        },
+        "inner": {
+          "width": 14,
+          "height": 14
+        },
+        "outerDisplay": "flex"
+      },
+      "greeting": {
+        "x": 258,
+        "y": 44,
+        "width": 332,
+        "height": 26,
+        "bottom": 70,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "760",
+        "objectFit": "fill"
+      },
+      "summaryNumber": {
+        "x": 341,
+        "y": 161,
+        "width": 160,
+        "height": 27,
+        "bottom": 188,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "dangerNumber": {
+        "x": 1116,
+        "y": 161,
+        "width": 160,
+        "height": 27,
+        "bottom": 188,
+        "color": "rgb(185, 71, 67)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "medicationName": {
+        "x": 432,
+        "y": 315,
+        "width": 533,
+        "height": 17,
+        "bottom": 331,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "690",
+        "objectFit": "fill"
+      },
+      "warningName": {
+        "x": 1251,
+        "y": 322,
+        "width": 375,
+        "height": 18,
+        "bottom": 340,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "700",
+        "objectFit": "fill"
+      },
+      "sectionTitle": {
+        "x": 283,
+        "y": 265,
+        "width": 117,
+        "height": 22,
+        "bottom": 287,
+        "color": "rgb(79, 70, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "720",
+        "objectFit": "fill"
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "topbar-icon-button",
+          "text": "3",
+          "sw": 44,
+          "cw": 38
+        }
+      ]
+    }
+  },
+  {
+    "label": "standard",
+    "file": "screenshots/dashboard-v2-desktop-standard.png",
+    "screenshotSize": {
+      "width": 1920,
+      "height": 1080
+    },
+    "metrics": {
+      "innerWidth": 1920,
+      "innerHeight": 1080,
+      "devicePixelRatio": 1,
+      "path": "/",
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "logo": {
+        "x": 24,
+        "y": 34,
+        "width": 40,
+        "height": 40,
+        "bottom": 74,
+        "color": "rgb(71, 85, 105)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(135deg, rgb(255, 159, 10), rgb(255, 122, 0))",
+        "fontWeight": "650",
+        "objectFit": "cover"
+      },
+      "promoCard": {
+        "x": 18,
+        "y": 704,
+        "width": 187,
+        "height": 232,
+        "bottom": 936,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(251, 253, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "promoImage": {
+        "x": 33,
+        "y": 718,
+        "width": 157,
+        "height": 88,
+        "bottom": 806,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(244, 247, 252)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "contain"
+      },
+      "lastNavBottom": 584,
+      "lowerGrid": {
+        "x": 258,
+        "y": 784,
+        "width": 1530,
+        "height": 254,
+        "bottom": 1038,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "profileAvatar": {
+        "x": 1590,
+        "y": 53,
+        "width": 30,
+        "height": 30,
+        "bottom": 83,
+        "color": "rgb(100, 116, 139)",
+        "background": "rgb(248, 251, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "800",
+        "objectFit": "fill"
+      },
+      "profileBefore": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "profileAfter": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "familyFirstIcon": {
+        "x": 1211,
+        "y": 556,
+        "width": 25,
+        "height": 25,
+        "bottom": 581,
+        "color": "rgb(83, 98, 122)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "500",
+        "objectFit": "fill"
+      },
+      "dogContainment": [
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        },
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        }
+      ],
+      "reportIconCenter": {
+        "dx": 0,
+        "dy": 0.75,
+        "outer": {
+          "width": 26,
+          "height": 26
+        },
+        "inner": {
+          "width": 14,
+          "height": 14
+        },
+        "outerDisplay": "flex"
+      },
+      "greeting": {
+        "x": 258,
+        "y": 44,
+        "width": 332,
+        "height": 26,
+        "bottom": 70,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "760",
+        "objectFit": "fill"
+      },
+      "summaryNumber": {
+        "x": 341,
+        "y": 161,
+        "width": 160,
+        "height": 27,
+        "bottom": 188,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "dangerNumber": {
+        "x": 1116,
+        "y": 161,
+        "width": 160,
+        "height": 27,
+        "bottom": 188,
+        "color": "rgb(185, 71, 67)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "medicationName": {
+        "x": 432,
+        "y": 315,
+        "width": 533,
+        "height": 17,
+        "bottom": 331,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "690",
+        "objectFit": "fill"
+      },
+      "warningName": {
+        "x": 1251,
+        "y": 322,
+        "width": 375,
+        "height": 18,
+        "bottom": 340,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "700",
+        "objectFit": "fill"
+      },
+      "sectionTitle": {
+        "x": 283,
+        "y": 265,
+        "width": 117,
+        "height": 22,
+        "bottom": 287,
+        "color": "rgb(79, 70, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "720",
+        "objectFit": "fill"
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "topbar-icon-button",
+          "text": "3",
+          "sw": 44,
+          "cw": 38
+        }
+      ]
+    }
+  },
+  {
+    "label": "wide",
+    "file": "screenshots/dashboard-v2-desktop-wide.png",
+    "screenshotSize": {
+      "width": 2560,
+      "height": 1440
+    },
+    "metrics": {
+      "innerWidth": 2560,
+      "innerHeight": 1440,
+      "devicePixelRatio": 1,
+      "path": "/",
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "logo": {
+        "x": 24,
+        "y": 34,
+        "width": 40,
+        "height": 40,
+        "bottom": 74,
+        "color": "rgb(71, 85, 105)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(135deg, rgb(255, 159, 10), rgb(255, 122, 0))",
+        "fontWeight": "650",
+        "objectFit": "cover"
+      },
+      "promoCard": {
+        "x": 18,
+        "y": 1064,
+        "width": 187,
+        "height": 232,
+        "bottom": 1296,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(251, 253, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "promoImage": {
+        "x": 33,
+        "y": 1078,
+        "width": 157,
+        "height": 88,
+        "bottom": 1166,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(244, 247, 252)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "contain"
+      },
+      "lastNavBottom": 584,
+      "lowerGrid": {
+        "x": 258,
+        "y": 784,
+        "width": 2170,
+        "height": 254,
+        "bottom": 1038,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "profileAvatar": {
+        "x": 2230,
+        "y": 53,
+        "width": 30,
+        "height": 30,
+        "bottom": 83,
+        "color": "rgb(100, 116, 139)",
+        "background": "rgb(248, 251, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "800",
+        "objectFit": "fill"
+      },
+      "profileBefore": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "profileAfter": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "familyFirstIcon": {
+        "x": 1604,
+        "y": 556,
+        "width": 25,
+        "height": 25,
+        "bottom": 581,
+        "color": "rgb(83, 98, 122)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "500",
+        "objectFit": "fill"
+      },
+      "dogContainment": [
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        },
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        }
+      ],
+      "reportIconCenter": {
+        "dx": 0,
+        "dy": 0.75,
+        "outer": {
+          "width": 26,
+          "height": 26
+        },
+        "inner": {
+          "width": 14,
+          "height": 14
+        },
+        "outerDisplay": "flex"
+      },
+      "greeting": {
+        "x": 258,
+        "y": 44,
+        "width": 332,
+        "height": 26,
+        "bottom": 70,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "760",
+        "objectFit": "fill"
+      },
+      "summaryNumber": {
+        "x": 341,
+        "y": 161,
+        "width": 320,
+        "height": 27,
+        "bottom": 188,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "dangerNumber": {
+        "x": 1436,
+        "y": 161,
+        "width": 320,
+        "height": 27,
+        "bottom": 188,
+        "color": "rgb(185, 71, 67)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "medicationName": {
+        "x": 432,
+        "y": 315,
+        "width": 904,
+        "height": 17,
+        "bottom": 331,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "690",
+        "objectFit": "fill"
+      },
+      "warningName": {
+        "x": 1622,
+        "y": 322,
+        "width": 375,
+        "height": 18,
+        "bottom": 340,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "700",
+        "objectFit": "fill"
+      },
+      "sectionTitle": {
+        "x": 283,
+        "y": 265,
+        "width": 117,
+        "height": 22,
+        "bottom": 287,
+        "color": "rgb(79, 70, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "720",
+        "objectFit": "fill"
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "topbar-icon-button",
+          "text": "3",
+          "sw": 44,
+          "cw": 38
+        }
+      ]
+    }
+  },
+  {
+    "label": "macbook-retina",
+    "file": "screenshots/dashboard-v2-macbook-retina.png",
+    "screenshotSize": {
+      "width": 3024,
+      "height": 1964
+    },
+    "metrics": {
+      "innerWidth": 1512,
+      "innerHeight": 982,
+      "devicePixelRatio": 2,
+      "path": "/",
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "logo": {
+        "x": 24,
+        "y": 34,
+        "width": 40,
+        "height": 40,
+        "bottom": 74,
+        "color": "rgb(71, 85, 105)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(135deg, rgb(255, 159, 10), rgb(255, 122, 0))",
+        "fontWeight": "650",
+        "objectFit": "cover"
+      },
+      "promoCard": {
+        "x": 18,
+        "y": 616,
+        "width": 187,
+        "height": 232,
+        "bottom": 848,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(251, 253, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "promoImage": {
+        "x": 33,
+        "y": 630,
+        "width": 157,
+        "height": 88,
+        "bottom": 718,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(244, 247, 252)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "contain"
+      },
+      "lastNavBottom": 584,
+      "lowerGrid": {
+        "x": 258,
+        "y": 795,
+        "width": 1122,
+        "height": 254,
+        "bottom": 1049,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "profileAvatar": {
+        "x": 1182,
+        "y": 53,
+        "width": 30,
+        "height": 30,
+        "bottom": 83,
+        "color": "rgb(100, 116, 139)",
+        "background": "rgb(248, 251, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "800",
+        "objectFit": "fill"
+      },
+      "profileBefore": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "profileAfter": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "familyFirstIcon": {
+        "x": 812,
+        "y": 567,
+        "width": 25,
+        "height": 25,
+        "bottom": 592,
+        "color": "rgb(83, 98, 122)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "500",
+        "objectFit": "fill"
+      },
+      "dogContainment": [
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        },
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        }
+      ],
+      "reportIconCenter": {
+        "dx": 0,
+        "dy": 0.75,
+        "outer": {
+          "width": 26,
+          "height": 26
+        },
+        "inner": {
+          "width": 14,
+          "height": 14
+        },
+        "outerDisplay": "flex"
+      },
+      "greeting": {
+        "x": 258,
+        "y": 44,
+        "width": 332,
+        "height": 26,
+        "bottom": 70,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "760",
+        "objectFit": "fill"
+      },
+      "summaryNumber": {
+        "x": 341,
+        "y": 174,
+        "width": 58,
+        "height": 27,
+        "bottom": 201,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "dangerNumber": {
+        "x": 912,
+        "y": 174,
+        "width": 58,
+        "height": 27,
+        "bottom": 201,
+        "color": "rgb(185, 71, 67)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "medicationName": {
+        "x": 432,
+        "y": 325,
+        "width": 136,
+        "height": 17,
+        "bottom": 342,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "690",
+        "objectFit": "fill"
+      },
+      "warningName": {
+        "x": 854,
+        "y": 332,
+        "width": 375,
+        "height": 18,
+        "bottom": 350,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "700",
+        "objectFit": "fill"
+      },
+      "sectionTitle": {
+        "x": 283,
+        "y": 276,
+        "width": 117,
+        "height": 22,
+        "bottom": 297,
+        "color": "rgb(79, 70, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "720",
+        "objectFit": "fill"
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "topbar-icon-button",
+          "text": "3",
+          "sw": 44,
+          "cw": 38
+        },
+        {
+          "cls": "",
+          "text": "고혈압약 (암로디핀 5mg)",
+          "sw": 146,
+          "cw": 136
+        },
+        {
+          "cls": "dv2-card dv2-recent-card",
+          "text": "최근 복용 기록전체 보기 >5.23 (목)비타민C1정 | 아침본인",
+          "sw": 430,
+          "cw": 400
+        }
+      ]
+    }
+  },
+  {
+    "label": "tablet-smoke",
+    "file": "screenshots/dashboard-v2-tablet-pass03.png",
+    "screenshotSize": {
+      "width": 1024,
+      "height": 768
+    },
+    "metrics": {
+      "innerWidth": 1024,
+      "innerHeight": 768,
+      "devicePixelRatio": 1,
+      "path": "/",
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "logo": {
+        "x": 24,
+        "y": 31,
+        "width": 40,
+        "height": 40,
+        "bottom": 71,
+        "color": "rgb(71, 85, 105)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(135deg, rgb(255, 159, 10), rgb(255, 122, 0))",
+        "fontWeight": "650",
+        "objectFit": "cover"
+      },
+      "promoCard": {
+        "x": 18,
+        "y": 414,
+        "width": 169,
+        "height": 244,
+        "bottom": 658,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(251, 253, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "promoImage": {
+        "x": 33,
+        "y": 428,
+        "width": 139,
+        "height": 88,
+        "bottom": 516,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(244, 247, 252)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "contain"
+      },
+      "lastNavBottom": 487,
+      "lowerGrid": {
+        "x": 248,
+        "y": 1411,
+        "width": 734,
+        "height": 802,
+        "bottom": 2213,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "profileAvatar": {
+        "x": 784,
+        "y": 47,
+        "width": 30,
+        "height": 30,
+        "bottom": 77,
+        "color": "rgb(100, 116, 139)",
+        "background": "rgb(248, 251, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "800",
+        "objectFit": "fill"
+      },
+      "profileBefore": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "profileAfter": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "familyFirstIcon": {
+        "x": 310,
+        "y": 1182,
+        "width": 25,
+        "height": 25,
+        "bottom": 1207,
+        "color": "rgb(83, 98, 122)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "500",
+        "objectFit": "fill"
+      },
+      "dogContainment": [
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        },
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        }
+      ],
+      "reportIconCenter": {
+        "dx": 0,
+        "dy": 0.75,
+        "outer": {
+          "width": 26,
+          "height": 26
+        },
+        "inner": {
+          "width": 14,
+          "height": 14
+        },
+        "outerDisplay": "flex"
+      },
+      "greeting": {
+        "x": 248,
+        "y": 38,
+        "width": 222,
+        "height": 52,
+        "bottom": 90,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "760",
+        "objectFit": "fill"
+      },
+      "summaryNumber": {
+        "x": 327,
+        "y": 197,
+        "width": 157,
+        "height": 27,
+        "bottom": 224,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "dangerNumber": {
+        "x": 327,
+        "y": 317,
+        "width": 157,
+        "height": 27,
+        "bottom": 344,
+        "color": "rgb(185, 71, 67)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "medicationName": {
+        "x": 422,
+        "y": 470,
+        "width": 396,
+        "height": 17,
+        "bottom": 487,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "690",
+        "objectFit": "fill"
+      },
+      "warningName": {
+        "x": 342,
+        "y": 948,
+        "width": 375,
+        "height": 18,
+        "bottom": 966,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "700",
+        "objectFit": "fill"
+      },
+      "sectionTitle": {
+        "x": 273,
+        "y": 421,
+        "width": 117,
+        "height": 22,
+        "bottom": 442,
+        "color": "rgb(79, 70, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "720",
+        "objectFit": "fill"
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "topbar-icon-button",
+          "text": "3",
+          "sw": 44,
+          "cw": 38
+        },
+        {
+          "cls": "ghost-button topbar-help-button",
+          "text": "ⓘ도움말",
+          "sw": 47,
+          "cw": 40
+        }
+      ]
+    }
+  },
+  {
+    "label": "mobile-smoke",
+    "file": "screenshots/dashboard-v2-mobile-pass03.png",
+    "screenshotSize": {
+      "width": 1170,
+      "height": 2532
+    },
+    "metrics": {
+      "innerWidth": 390,
+      "innerHeight": 844,
+      "devicePixelRatio": 3,
+      "path": "/",
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "logo": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "bottom": 0,
+        "color": "rgb(71, 85, 105)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "linear-gradient(135deg, rgb(255, 159, 10), rgb(255, 122, 0))",
+        "fontWeight": "650",
+        "objectFit": "cover"
+      },
+      "promoCard": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "bottom": 0,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(251, 253, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "promoImage": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "bottom": 0,
+        "color": "rgb(17, 24, 39)",
+        "background": "rgb(244, 247, 252)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "contain"
+      },
+      "lastNavBottom": 0,
+      "lowerGrid": {
+        "x": 16,
+        "y": 1833,
+        "width": 358,
+        "height": 841,
+        "bottom": 2673,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "400",
+        "objectFit": "fill"
+      },
+      "profileAvatar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "bottom": 0,
+        "color": "rgb(100, 116, 139)",
+        "background": "rgb(248, 251, 255)",
+        "backgroundImage": "none",
+        "fontWeight": "800",
+        "objectFit": "fill"
+      },
+      "profileBefore": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "profileAfter": {
+        "display": "block",
+        "borderTopWidth": "1px"
+      },
+      "familyFirstIcon": {
+        "x": 71,
+        "y": 1542,
+        "width": 25,
+        "height": 25,
+        "bottom": 1567,
+        "color": "rgb(83, 98, 122)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "500",
+        "objectFit": "fill"
+      },
+      "dogContainment": [
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        },
+        {
+          "box": {
+            "width": 50,
+            "height": 50
+          },
+          "parts": [
+            {
+              "cls": "dv2-dog-ear left",
+              "left": 4.4,
+              "top": 2.8,
+              "right": 24.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-ear right",
+              "left": 24.4,
+              "top": 2.8,
+              "right": 4.4,
+              "bottom": 23.8
+            },
+            {
+              "cls": "dv2-dog-face",
+              "left": 9,
+              "top": 11,
+              "right": 9,
+              "bottom": 9
+            }
+          ]
+        }
+      ],
+      "reportIconCenter": {
+        "dx": 0,
+        "dy": 0.75,
+        "outer": {
+          "width": 26,
+          "height": 26
+        },
+        "inner": {
+          "width": 14,
+          "height": 14
+        },
+        "outerDisplay": "flex"
+      },
+      "greeting": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "bottom": 0,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "760",
+        "objectFit": "fill"
+      },
+      "summaryNumber": {
+        "x": 95,
+        "y": 175,
+        "width": 158,
+        "height": 27,
+        "bottom": 202,
+        "color": "rgb(51, 65, 85)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "dangerNumber": {
+        "x": 95,
+        "y": 387,
+        "width": 158,
+        "height": 27,
+        "bottom": 414,
+        "color": "rgb(185, 71, 67)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "770",
+        "objectFit": "fill"
+      },
+      "medicationName": {
+        "x": 164,
+        "y": 651,
+        "width": 178,
+        "height": 17,
+        "bottom": 668,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "690",
+        "objectFit": "fill"
+      },
+      "warningName": {
+        "x": 106,
+        "y": 1307,
+        "width": 228,
+        "height": 18,
+        "bottom": 1325,
+        "color": "rgb(47, 58, 74)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "700",
+        "objectFit": "fill"
+      },
+      "sectionTitle": {
+        "x": 35,
+        "y": 579,
+        "width": 97,
+        "height": 43,
+        "bottom": 622,
+        "color": "rgb(79, 70, 229)",
+        "background": "rgba(0, 0, 0, 0)",
+        "backgroundImage": "none",
+        "fontWeight": "720",
+        "objectFit": "fill"
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "",
+          "text": "안녕하세요. JEONG UNG KIM님!",
+          "sw": 282,
+          "cw": 210
+        }
+      ]
+    }
+  }
+]

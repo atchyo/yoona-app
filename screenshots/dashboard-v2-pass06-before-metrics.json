@@ -1,0 +1,517 @@
+{
+  "innerWidth": 1920,
+  "innerHeight": 1080,
+  "devicePixelRatio": 2,
+  "greetingText": "안녕하세요. JEONG UNG KIM님!",
+  "rects": {
+    "navItem": {
+      "top": 121,
+      "bottom": 161,
+      "left": 18,
+      "right": 205,
+      "width": 187,
+      "height": 40
+    },
+    "activeNavItem": {
+      "top": 121,
+      "bottom": 161,
+      "left": 18,
+      "right": 205,
+      "width": 187,
+      "height": 40
+    },
+    "promoCard": {
+      "top": 794.16,
+      "bottom": 1043,
+      "left": 18,
+      "right": 205,
+      "width": 187,
+      "height": 248.84
+    },
+    "recentMedicationCard": {
+      "top": 789.66,
+      "bottom": 1049.06,
+      "left": 258,
+      "right": 814.41,
+      "width": 556.41,
+      "height": 259.41
+    },
+    "summaryCard": {
+      "top": 114,
+      "bottom": 214.63,
+      "left": 258,
+      "right": 625.5,
+      "width": 367.5,
+      "height": 100.63
+    },
+    "scheduleRow": {
+      "top": 305.81,
+      "bottom": 360,
+      "left": 283,
+      "right": 1104.16,
+      "width": 821.16,
+      "height": 54.19
+    },
+    "lowerGrid": {
+      "top": 789.66,
+      "bottom": 1049.06,
+      "left": 258,
+      "right": 1788,
+      "width": 1530,
+      "height": 259.41
+    }
+  },
+  "bottomDelta": 6.06,
+  "textStyles": {
+    "sidebarMenuLabel": {
+      "selector": ".dashboard-v2-shell .nav-item",
+      "text": "대시보드",
+      "fontSize": "15px",
+      "fontWeight": "720",
+      "lineHeight": "16.5px",
+      "color": "rgb(79, 70, 229)",
+      "rect": {
+        "top": 121,
+        "bottom": 161,
+        "width": 187,
+        "height": 40
+      },
+      "scrollWidth": 187,
+      "clientWidth": 187,
+      "scrollHeight": 40,
+      "clientHeight": 40
+    },
+    "sidebarActiveMenuLabel": {
+      "selector": ".dashboard-v2-shell .nav-item.active",
+      "text": "대시보드",
+      "fontSize": "15px",
+      "fontWeight": "720",
+      "lineHeight": "16.5px",
+      "color": "rgb(79, 70, 229)",
+      "rect": {
+        "top": 121,
+        "bottom": 161,
+        "width": 187,
+        "height": 40
+      },
+      "scrollWidth": 187,
+      "clientWidth": 187,
+      "scrollHeight": 40,
+      "clientHeight": 40
+    },
+    "logoTitle": {
+      "selector": ".dashboard-v2-shell .brand-block strong",
+      "text": "Opti-Me",
+      "fontSize": "19px",
+      "fontWeight": "840",
+      "lineHeight": "19.95px",
+      "color": "rgb(79, 70, 229)",
+      "rect": {
+        "top": 32.28,
+        "bottom": 52.22,
+        "width": 76.63,
+        "height": 19.94
+      },
+      "scrollWidth": 77,
+      "clientWidth": 77,
+      "scrollHeight": 20,
+      "clientHeight": 20
+    },
+    "logoSubtitle": {
+      "selector": ".dashboard-v2-shell .brand-block span",
+      "text": "",
+      "fontSize": "14px",
+      "fontWeight": "650",
+      "lineHeight": "17.5px",
+      "color": "rgb(71, 85, 105)",
+      "rect": {
+        "top": 34,
+        "bottom": 74,
+        "width": 40,
+        "height": 40
+      },
+      "scrollWidth": 40,
+      "clientWidth": 40,
+      "scrollHeight": 40,
+      "clientHeight": 40
+    },
+    "promoTitle": {
+      "selector": ".dashboard-v2-shell .sidebar-card strong",
+      "text": "우리 가족의 건강을 한눈에, 스마트하게",
+      "fontSize": "15px",
+      "fontWeight": "700",
+      "lineHeight": "19.2px",
+      "color": "rgb(51, 65, 85)",
+      "rect": {
+        "top": 914.16,
+        "bottom": 952.53,
+        "width": 157,
+        "height": 38.38
+      },
+      "scrollWidth": 157,
+      "clientWidth": 157,
+      "scrollHeight": 38,
+      "clientHeight": 38
+    },
+    "promoBody": {
+      "selector": ".dashboard-v2-shell .sidebar-card p",
+      "text": "약과 영양제, 반려동물 기록까지 안전하고 체계적으로 관리하세요.",
+      "fontSize": "13.5px",
+      "fontWeight": "560",
+      "lineHeight": "19.17px",
+      "color": "rgb(100, 116, 139)",
+      "rect": {
+        "top": 968.53,
+        "bottom": 1026,
+        "width": 157,
+        "height": 57.47
+      },
+      "scrollWidth": 157,
+      "clientWidth": 157,
+      "scrollHeight": 57,
+      "clientHeight": 57
+    },
+    "greeting": {
+      "selector": ".dashboard-v2-shell .topbar-title h1",
+      "text": "안녕하세요. JEONG UNG KIM님!",
+      "fontSize": "25px",
+      "fontWeight": "760",
+      "lineHeight": "27px",
+      "color": "rgb(51, 65, 85)",
+      "rect": {
+        "top": 44,
+        "bottom": 71,
+        "width": 345.44,
+        "height": 27
+      },
+      "scrollWidth": 345,
+      "clientWidth": 345,
+      "scrollHeight": 28,
+      "clientHeight": 27
+    },
+    "summaryTitle": {
+      "selector": ".dv2-summary-copy span",
+      "text": "복용중인 약",
+      "fontSize": "14px",
+      "fontWeight": "700",
+      "lineHeight": "15.96px",
+      "color": "rgb(100, 116, 139)",
+      "rect": {
+        "top": 138,
+        "bottom": 153.95,
+        "width": 159.5,
+        "height": 15.95
+      },
+      "scrollWidth": 160,
+      "clientWidth": 160,
+      "scrollHeight": 16,
+      "clientHeight": 16
+    },
+    "summaryNumber": {
+      "selector": ".dv2-summary-copy strong",
+      "text": "7개",
+      "fontSize": "28px",
+      "fontWeight": "770",
+      "lineHeight": "29.68px",
+      "color": "rgb(51, 65, 85)",
+      "rect": {
+        "top": 160.95,
+        "bottom": 190.63,
+        "width": 159.5,
+        "height": 29.67
+      },
+      "scrollWidth": 160,
+      "clientWidth": 160,
+      "scrollHeight": 31,
+      "clientHeight": 30
+    },
+    "sectionTitle": {
+      "selector": ".dv2-card-title-row h2",
+      "text": "오늘의 복용 일정",
+      "fontSize": "18.5px",
+      "fontWeight": "720",
+      "lineHeight": "22.2px",
+      "color": "rgb(79, 70, 229)",
+      "rect": {
+        "top": 265.63,
+        "bottom": 287.81,
+        "width": 120.48,
+        "height": 22.19
+      },
+      "scrollWidth": 120,
+      "clientWidth": 120,
+      "scrollHeight": 22,
+      "clientHeight": 22
+    },
+    "medicationName": {
+      "selector": ".dv2-medication-copy strong",
+      "text": "고혈압약 (암로디핀 5mg)",
+      "fontSize": "15px",
+      "fontWeight": "690",
+      "lineHeight": "18px",
+      "color": "rgb(47, 58, 74)",
+      "rect": {
+        "top": 314.81,
+        "bottom": 332.81,
+        "width": 533.2,
+        "height": 18
+      },
+      "scrollWidth": 533,
+      "clientWidth": 533,
+      "scrollHeight": 18,
+      "clientHeight": 18
+    },
+    "scheduleMeta": {
+      "selector": ".dv2-schedule-time span",
+      "text": "아침",
+      "fontSize": "13.5px",
+      "fontWeight": "580",
+      "lineHeight": "16.2px",
+      "color": "rgb(124, 138, 160)",
+      "rect": {
+        "top": 333.31,
+        "bottom": 349.5,
+        "width": 78,
+        "height": 16.19
+      },
+      "scrollWidth": 78,
+      "clientWidth": 78,
+      "scrollHeight": 16,
+      "clientHeight": 16
+    },
+    "recentDate": {
+      "selector": ".dv2-recent-date",
+      "text": "5.23 (목)",
+      "fontSize": "13.5px",
+      "fontWeight": "620",
+      "lineHeight": "normal",
+      "color": "rgb(100, 116, 139)",
+      "rect": {
+        "top": 872.2,
+        "bottom": 888.2,
+        "width": 68,
+        "height": 16
+      },
+      "scrollWidth": 68,
+      "clientWidth": 68,
+      "scrollHeight": 16,
+      "clientHeight": 16
+    },
+    "recentDose": {
+      "selector": ".dv2-recent-dose",
+      "text": "1정 | 아침",
+      "fontSize": "13.5px",
+      "fontWeight": "620",
+      "lineHeight": "normal",
+      "color": "rgb(100, 116, 139)",
+      "rect": {
+        "top": 872.2,
+        "bottom": 888.2,
+        "width": 78,
+        "height": 16
+      },
+      "scrollWidth": 78,
+      "clientWidth": 78,
+      "scrollHeight": 16,
+      "clientHeight": 16
+    },
+    "recentMedicationName": {
+      "selector": ".dv2-recent-row strong",
+      "text": "비타민C",
+      "fontSize": "14px",
+      "fontWeight": "700",
+      "lineHeight": "normal",
+      "color": "rgb(47, 58, 74)",
+      "rect": {
+        "top": 871.7,
+        "bottom": 888.7,
+        "width": 202.34,
+        "height": 17
+      },
+      "scrollWidth": 202,
+      "clientWidth": 202,
+      "scrollHeight": 17,
+      "clientHeight": 17
+    },
+    "aiBody": {
+      "selector": ".dv2-ai-answer",
+      "text": "일반적인 감기약 중 일부는 졸음을 유발할 수 있어 운전에 주의가 필요합니다. 항히스타민 성분을 확인하고, 복용 전 약사와 상담해 보세요.",
+      "fontSize": "14.5px",
+      "fontWeight": "590",
+      "lineHeight": "22.475px",
+      "color": "rgb(100, 116, 139)",
+      "rect": {
+        "top": 861.66,
+        "bottom": 971.06,
+        "width": 412.8,
+        "height": 109.41
+      },
+      "scrollWidth": 411,
+      "clientWidth": 411,
+      "scrollHeight": 107,
+      "clientHeight": 107
+    },
+    "reportTitle": {
+      "selector": ".dv2-report-row > div strong",
+      "text": "김가족님 복약 지도 리포트",
+      "fontSize": "14px",
+      "fontWeight": "700",
+      "lineHeight": "16.8px",
+      "color": "rgb(47, 58, 74)",
+      "rect": {
+        "top": 849.31,
+        "bottom": 866.11,
+        "width": 296.73,
+        "height": 16.8
+      },
+      "scrollWidth": 297,
+      "clientWidth": 297,
+      "scrollHeight": 17,
+      "clientHeight": 17
+    },
+    "reportDate": {
+      "selector": ".dv2-report-row > div span",
+      "text": "2024.05.24",
+      "fontSize": "13.5px",
+      "fontWeight": "580",
+      "lineHeight": "normal",
+      "color": "rgb(100, 116, 139)",
+      "rect": {
+        "top": 868.11,
+        "bottom": 884.11,
+        "width": 296.73,
+        "height": 16
+      },
+      "scrollWidth": 297,
+      "clientWidth": 297,
+      "scrollHeight": 16,
+      "clientHeight": 16
+    },
+    "warningBody": {
+      "selector": ".dv2-warning-copy p",
+      "text": "감기약 성분이 혈압을 올릴 수 있어 고혈압약 효과를 떨어뜨릴 수 있습니다.",
+      "fontSize": "14.5px",
+      "fontWeight": "620",
+      "lineHeight": "21.025px",
+      "color": "rgb(100, 116, 139)",
+      "rect": {
+        "top": 347.41,
+        "bottom": 368.42,
+        "width": 417.33,
+        "height": 21.02
+      },
+      "scrollWidth": 417,
+      "clientWidth": 417,
+      "scrollHeight": 21,
+      "clientHeight": 21
+    },
+    "familyName": {
+      "selector": ".dv2-family-person strong",
+      "text": "본인",
+      "fontSize": "13px",
+      "fontWeight": "680",
+      "lineHeight": "15.6px",
+      "color": "rgb(71, 85, 105)",
+      "rect": {
+        "top": 604.22,
+        "bottom": 619.81,
+        "width": 22.5,
+        "height": 15.59
+      },
+      "scrollWidth": 23,
+      "clientWidth": 23,
+      "scrollHeight": 16,
+      "clientHeight": 16
+    },
+    "petName": {
+      "selector": ".dv2-pet-copy strong",
+      "text": "강아지",
+      "fontSize": "15px",
+      "fontWeight": "720",
+      "lineHeight": "17.25px",
+      "color": "rgb(71, 85, 105)",
+      "rect": {
+        "top": 710.22,
+        "bottom": 727.47,
+        "width": 89.5,
+        "height": 17.25
+      },
+      "scrollWidth": 90,
+      "clientWidth": 90,
+      "scrollHeight": 17,
+      "clientHeight": 17
+    },
+    "petMeta": {
+      "selector": ".dv2-pet-copy p",
+      "text": "말티즈 | 9살",
+      "fontSize": "13.5px",
+      "fontWeight": "520",
+      "lineHeight": "16.2px",
+      "color": "rgb(100, 116, 139)",
+      "rect": {
+        "top": 729.47,
+        "bottom": 745.66,
+        "width": 89.5,
+        "height": 16.19
+      },
+      "scrollWidth": 90,
+      "clientWidth": 90,
+      "scrollHeight": 16,
+      "clientHeight": 16
+    },
+    "badge": {
+      "selector": ".dv2-badge",
+      "text": "본인",
+      "fontSize": "11px",
+      "fontWeight": "760",
+      "lineHeight": "11px",
+      "color": "rgb(79, 75, 216)",
+      "rect": {
+        "top": 320.91,
+        "bottom": 344.91,
+        "width": 41.03,
+        "height": 24
+      },
+      "scrollWidth": 39,
+      "clientWidth": 39,
+      "scrollHeight": 22,
+      "clientHeight": 22
+    },
+    "cta": {
+      "selector": ".dv2-card-link",
+      "text": "전체 보기",
+      "fontSize": "13.5px",
+      "fontWeight": "760",
+      "lineHeight": "normal",
+      "color": "rgb(80, 75, 217)",
+      "rect": {
+        "top": 156.31,
+        "bottom": 172.31,
+        "width": 66,
+        "height": 16
+      },
+      "scrollWidth": 66,
+      "clientWidth": 66,
+      "scrollHeight": 16,
+      "clientHeight": 16
+    },
+    "primaryButton": {
+      "selector": ".dv2-primary-wide-button",
+      "text": "새 리포트 생성",
+      "fontSize": "13px",
+      "fontWeight": "720",
+      "lineHeight": "normal",
+      "color": "rgb(255, 255, 255)",
+      "rect": {
+        "top": 990.06,
+        "bottom": 1026.06,
+        "width": 412.8,
+        "height": 36
+      },
+      "scrollWidth": 413,
+      "clientWidth": 413,
+      "scrollHeight": 36,
+      "clientHeight": 36
+    }
+  }
+}

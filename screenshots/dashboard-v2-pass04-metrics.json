@@ -1,0 +1,593 @@
+[
+  {
+    "label": "desktop-4k",
+    "file": "screenshots/dashboard-v2-desktop-4k.png",
+    "screenshotSize": {
+      "width": 3840,
+      "height": 2160
+    },
+    "metrics": {
+      "innerWidth": 1920,
+      "innerHeight": 1080,
+      "devicePixelRatio": 2,
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "promoCard": {
+        "top": 795.09,
+        "bottom": 1043,
+        "height": 247.91
+      },
+      "recentMedicationCard": {
+        "top": 785.89,
+        "bottom": 1042.95,
+        "height": 257.06
+      },
+      "bottomDelta": 0.05,
+      "promoImage": {
+        "objectFit": "contain",
+        "scrollHeight": 88,
+        "clientHeight": 88
+      },
+      "textStyles": {
+        "sidebarNav": {
+          "top": 121,
+          "bottom": 161,
+          "height": 40,
+          "width": 187,
+          "fontSize": "14.5px",
+          "fontWeight": "720",
+          "lineHeight": "15.95px"
+        },
+        "summaryTitle": {
+          "top": 139.58,
+          "bottom": 154.42,
+          "height": 14.84,
+          "width": 159.5,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "14.85px"
+        },
+        "summaryNumber": {
+          "top": 161.42,
+          "bottom": 188.42,
+          "height": 27,
+          "width": 159.5,
+          "fontSize": "27px",
+          "fontWeight": "770",
+          "lineHeight": "27px"
+        },
+        "sectionTitle": {
+          "top": 265,
+          "bottom": 286.59,
+          "height": 21.59,
+          "width": 117.23,
+          "fontSize": "18px",
+          "fontWeight": "720",
+          "lineHeight": "21.6px"
+        },
+        "scheduleMeta": {
+          "top": 332.98,
+          "bottom": 348.58,
+          "height": 15.59,
+          "width": 533.2,
+          "fontSize": "13px",
+          "fontWeight": "580",
+          "lineHeight": "15.6px"
+        },
+        "medicationName": {
+          "top": 313.59,
+          "bottom": 330.98,
+          "height": 17.39,
+          "width": 533.2,
+          "fontSize": "14.5px",
+          "fontWeight": "690",
+          "lineHeight": "17.4px"
+        },
+        "recentDate": {
+          "top": 866.86,
+          "bottom": 882.86,
+          "height": 16,
+          "width": 68,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "recentDose": {
+          "top": 866.86,
+          "bottom": 882.86,
+          "height": 16,
+          "width": 78,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "recentMedicine": {
+          "top": 866.86,
+          "bottom": 882.86,
+          "height": 16,
+          "width": 202.34,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "normal"
+        },
+        "aiAnswer": {
+          "top": 857.89,
+          "bottom": 964.95,
+          "height": 107.06,
+          "width": 412.8,
+          "fontSize": "14px",
+          "fontWeight": "590",
+          "lineHeight": "21.7px"
+        },
+        "chatInput": {
+          "top": 977.95,
+          "bottom": 1019.95,
+          "height": 42,
+          "width": 374.8,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "reportDate": {
+          "top": 863.16,
+          "bottom": 879.16,
+          "height": 16,
+          "width": 296.73,
+          "fontSize": "13px",
+          "fontWeight": "580",
+          "lineHeight": "normal"
+        },
+        "reportTitle": {
+          "top": 844.97,
+          "bottom": 861.16,
+          "height": 16.19,
+          "width": 296.73,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "16.2px"
+        },
+        "petMeta": {
+          "top": 726.02,
+          "bottom": 741.61,
+          "height": 15.59,
+          "width": 86.84,
+          "fontSize": "13px",
+          "fontWeight": "520",
+          "lineHeight": "15.6px"
+        },
+        "familyName": {
+          "top": 601.69,
+          "bottom": 616.69,
+          "height": 15,
+          "width": 21.63,
+          "fontSize": "12.5px",
+          "fontWeight": "680",
+          "lineHeight": "15px"
+        },
+        "badge": {
+          "top": 319.09,
+          "bottom": 343.09,
+          "height": 24,
+          "width": 41.03,
+          "fontSize": "11px",
+          "fontWeight": "760",
+          "lineHeight": "11px"
+        },
+        "cta": {
+          "top": 983.95,
+          "bottom": 1019.95,
+          "height": 36,
+          "width": 412.8,
+          "fontSize": "13px",
+          "fontWeight": "720",
+          "lineHeight": "normal"
+        }
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "topbar-icon-button",
+          "text": "3",
+          "sw": 44,
+          "cw": 38
+        }
+      ]
+    }
+  },
+  {
+    "label": "desktop-standard",
+    "file": "screenshots/dashboard-v2-desktop-standard.png",
+    "screenshotSize": {
+      "width": 1920,
+      "height": 1080
+    },
+    "metrics": {
+      "innerWidth": 1920,
+      "innerHeight": 1080,
+      "devicePixelRatio": 1,
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "promoCard": {
+        "top": 795.09,
+        "bottom": 1043,
+        "height": 247.91
+      },
+      "recentMedicationCard": {
+        "top": 785.89,
+        "bottom": 1042.95,
+        "height": 257.06
+      },
+      "bottomDelta": 0.05,
+      "promoImage": {
+        "objectFit": "contain",
+        "scrollHeight": 88,
+        "clientHeight": 88
+      },
+      "textStyles": {
+        "sidebarNav": {
+          "top": 121,
+          "bottom": 161,
+          "height": 40,
+          "width": 187,
+          "fontSize": "14.5px",
+          "fontWeight": "720",
+          "lineHeight": "15.95px"
+        },
+        "summaryTitle": {
+          "top": 139.58,
+          "bottom": 154.42,
+          "height": 14.84,
+          "width": 159.5,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "14.85px"
+        },
+        "summaryNumber": {
+          "top": 161.42,
+          "bottom": 188.42,
+          "height": 27,
+          "width": 159.5,
+          "fontSize": "27px",
+          "fontWeight": "770",
+          "lineHeight": "27px"
+        },
+        "sectionTitle": {
+          "top": 265,
+          "bottom": 286.59,
+          "height": 21.59,
+          "width": 117.23,
+          "fontSize": "18px",
+          "fontWeight": "720",
+          "lineHeight": "21.6px"
+        },
+        "scheduleMeta": {
+          "top": 332.98,
+          "bottom": 348.58,
+          "height": 15.59,
+          "width": 533.2,
+          "fontSize": "13px",
+          "fontWeight": "580",
+          "lineHeight": "15.6px"
+        },
+        "medicationName": {
+          "top": 313.59,
+          "bottom": 330.98,
+          "height": 17.39,
+          "width": 533.2,
+          "fontSize": "14.5px",
+          "fontWeight": "690",
+          "lineHeight": "17.4px"
+        },
+        "recentDate": {
+          "top": 866.86,
+          "bottom": 882.86,
+          "height": 16,
+          "width": 68,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "recentDose": {
+          "top": 866.86,
+          "bottom": 882.86,
+          "height": 16,
+          "width": 78,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "recentMedicine": {
+          "top": 866.86,
+          "bottom": 882.86,
+          "height": 16,
+          "width": 202.34,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "normal"
+        },
+        "aiAnswer": {
+          "top": 857.89,
+          "bottom": 964.95,
+          "height": 107.06,
+          "width": 412.8,
+          "fontSize": "14px",
+          "fontWeight": "590",
+          "lineHeight": "21.7px"
+        },
+        "chatInput": {
+          "top": 977.95,
+          "bottom": 1019.95,
+          "height": 42,
+          "width": 374.8,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "reportDate": {
+          "top": 863.16,
+          "bottom": 879.16,
+          "height": 16,
+          "width": 296.73,
+          "fontSize": "13px",
+          "fontWeight": "580",
+          "lineHeight": "normal"
+        },
+        "reportTitle": {
+          "top": 844.97,
+          "bottom": 861.16,
+          "height": 16.19,
+          "width": 296.73,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "16.2px"
+        },
+        "petMeta": {
+          "top": 726.02,
+          "bottom": 741.61,
+          "height": 15.59,
+          "width": 86.84,
+          "fontSize": "13px",
+          "fontWeight": "520",
+          "lineHeight": "15.6px"
+        },
+        "familyName": {
+          "top": 601.69,
+          "bottom": 616.69,
+          "height": 15,
+          "width": 21.63,
+          "fontSize": "12.5px",
+          "fontWeight": "680",
+          "lineHeight": "15px"
+        },
+        "badge": {
+          "top": 319.09,
+          "bottom": 343.09,
+          "height": 24,
+          "width": 41.03,
+          "fontSize": "11px",
+          "fontWeight": "760",
+          "lineHeight": "11px"
+        },
+        "cta": {
+          "top": 983.95,
+          "bottom": 1019.95,
+          "height": 36,
+          "width": 412.8,
+          "fontSize": "13px",
+          "fontWeight": "720",
+          "lineHeight": "normal"
+        }
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "topbar-icon-button",
+          "text": "3",
+          "sw": 44,
+          "cw": 38
+        }
+      ]
+    }
+  },
+  {
+    "label": "macbook-retina",
+    "file": "screenshots/dashboard-v2-macbook-retina.png",
+    "screenshotSize": {
+      "width": 3024,
+      "height": 1964
+    },
+    "metrics": {
+      "innerWidth": 1512,
+      "innerHeight": 982,
+      "devicePixelRatio": 2,
+      "greetingText": "안녕하세요. JEONG UNG KIM님!",
+      "promoCard": {
+        "top": 697.09,
+        "bottom": 945,
+        "height": 247.91
+      },
+      "recentMedicationCard": {
+        "top": 797.58,
+        "bottom": 1076.33,
+        "height": 278.75
+      },
+      "bottomDelta": 131.33,
+      "promoImage": {
+        "objectFit": "contain",
+        "scrollHeight": 88,
+        "clientHeight": 88
+      },
+      "textStyles": {
+        "sidebarNav": {
+          "top": 121,
+          "bottom": 161,
+          "height": 40,
+          "width": 187,
+          "fontSize": "14.5px",
+          "fontWeight": "720",
+          "lineHeight": "15.95px"
+        },
+        "summaryTitle": {
+          "top": 138,
+          "bottom": 167.69,
+          "height": 29.69,
+          "width": 57.5,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "14.85px"
+        },
+        "summaryNumber": {
+          "top": 174.69,
+          "bottom": 201.69,
+          "height": 27,
+          "width": 57.5,
+          "fontSize": "27px",
+          "fontWeight": "770",
+          "lineHeight": "27px"
+        },
+        "sectionTitle": {
+          "top": 276.69,
+          "bottom": 298.28,
+          "height": 21.59,
+          "width": 117.23,
+          "fontSize": "18px",
+          "fontWeight": "720",
+          "lineHeight": "21.6px"
+        },
+        "scheduleMeta": {
+          "top": 344.67,
+          "bottom": 360.27,
+          "height": 15.59,
+          "width": 136.03,
+          "fontSize": "13px",
+          "fontWeight": "580",
+          "lineHeight": "15.6px"
+        },
+        "medicationName": {
+          "top": 325.28,
+          "bottom": 342.67,
+          "height": 17.39,
+          "width": 136.03,
+          "fontSize": "14.5px",
+          "fontWeight": "690",
+          "lineHeight": "17.4px"
+        },
+        "recentDate": {
+          "top": 890.75,
+          "bottom": 906.75,
+          "height": 16,
+          "width": 68,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "recentDose": {
+          "top": 890.75,
+          "bottom": 906.75,
+          "height": 16,
+          "width": 78,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "recentMedicine": {
+          "top": 890.75,
+          "bottom": 906.75,
+          "height": 16,
+          "width": 99.52,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "normal"
+        },
+        "aiAnswer": {
+          "top": 869.58,
+          "bottom": 998.33,
+          "height": 128.75,
+          "width": 285.8,
+          "fontSize": "14px",
+          "fontWeight": "590",
+          "lineHeight": "21.7px"
+        },
+        "chatInput": {
+          "top": 1011.33,
+          "bottom": 1053.33,
+          "height": 42,
+          "width": 247.8,
+          "fontSize": "13px",
+          "fontWeight": "620",
+          "lineHeight": "normal"
+        },
+        "reportDate": {
+          "top": 878.45,
+          "bottom": 894.45,
+          "height": 16,
+          "width": 169.75,
+          "fontSize": "13px",
+          "fontWeight": "580",
+          "lineHeight": "normal"
+        },
+        "reportTitle": {
+          "top": 860.27,
+          "bottom": 876.45,
+          "height": 16.19,
+          "width": 169.75,
+          "fontSize": "13.5px",
+          "fontWeight": "700",
+          "lineHeight": "16.2px"
+        },
+        "petMeta": {
+          "top": 737.7,
+          "bottom": 753.3,
+          "height": 15.59,
+          "width": 86.84,
+          "fontSize": "13px",
+          "fontWeight": "520",
+          "lineHeight": "15.6px"
+        },
+        "familyName": {
+          "top": 613.38,
+          "bottom": 628.38,
+          "height": 15,
+          "width": 21.63,
+          "fontSize": "12.5px",
+          "fontWeight": "680",
+          "lineHeight": "15px"
+        },
+        "badge": {
+          "top": 330.78,
+          "bottom": 354.78,
+          "height": 24,
+          "width": 41.03,
+          "fontSize": "11px",
+          "fontWeight": "760",
+          "lineHeight": "11px"
+        },
+        "cta": {
+          "top": 1017.33,
+          "bottom": 1053.33,
+          "height": 36,
+          "width": 285.81,
+          "fontSize": "13px",
+          "fontWeight": "720",
+          "lineHeight": "normal"
+        }
+      },
+      "horizontalOverflow": [
+        {
+          "cls": "topbar-icon-button",
+          "text": "3",
+          "sw": 44,
+          "cw": 38
+        },
+        {
+          "cls": "",
+          "text": "고혈압약 (암로디핀 5mg)",
+          "sw": 151,
+          "cw": 136
+        },
+        {
+          "cls": "dv2-card dv2-recent-card",
+          "text": "최근 복용 기록전체 보기 >5.23 (목)비타민C1정 | 아침본인완료5.23",
+          "sw": 430,
+          "cw": 400
+        }
+      ]
+    }
+  }
+]
